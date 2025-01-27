@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2022, Cornutum Project
 //                             www.cornutum.org
@@ -12,67 +12,60 @@ import java.util.Optional;
 /**
  * Represents a schema validation error.
  */
-public class SchemaValidationError
-  {
-  /**
-   * Creates a new SchemaValidationError instance.
-   */
-  public SchemaValidationError( String dataLocation, String schemaLocation, String reason)
-    {
-    dataLocation_ = dataLocation;
-    schemaLocation_ = schemaLocation;
-    reason_ = reason;
+public class SchemaValidationError {
+    /**
+     * Creates a new SchemaValidationError instance.
+     */
+    public SchemaValidationError(String dataLocation, String schemaLocation, String reason) {
+        dataLocation_ = dataLocation;
+        schemaLocation_ = schemaLocation;
+        reason_ = reason;
     }
 
-  /**
-   * Returns the data location of the error.
-   */
-  public String getDataLocation()
-    {
-    return dataLocation_;
+    /**
+     * Returns the data location of the error.
+     */
+    public String getDataLocation() {
+        return dataLocation_;
     }
 
-  /**
-   * Returns the schema location of the error.
-   */
-  public String getSchemaLocation()
-    {
-    return schemaLocation_;
+    /**
+     * Returns the schema location of the error.
+     */
+    public String getSchemaLocation() {
+        return schemaLocation_;
     }
 
-  /**
-   * Returns the complete location of the error.
-   */
-  public String getLocation()
-    {
-    return
-      String.format(
-        "%s%s",
-        getDataLocation(),
-        Optional.of( getSchemaLocation()).filter( path -> !path.isEmpty()).map( path -> String.format( "#%s", path)).orElse( ""));
-      }
-
-  /**
-   * Returns the reason for the error.
-   */
-  public String getReason()
-    {
-    return reason_;
+    /**
+     * Returns the complete location of the error.
+     */
+    public String getLocation() {
+        return
+                String.format(
+                        "%s%s",
+                        getDataLocation(),
+                        Optional.of(getSchemaLocation()).filter(path -> !path.isEmpty()).map(path -> String.format("#%s", path)).orElse(""));
     }
 
-  @Override
-  public String toString()
-    {
-    String location =
-      Optional.of( getLocation())
-      .filter( loc -> !loc.isEmpty())
-      .map( loc -> String.format( "%s: ", loc))
-      .orElse( "");
-    
-    return String.format( "%s%s", location, getReason());
+    /**
+     * Returns the reason for the error.
+     */
+    public String getReason() {
+        return reason_;
     }
-  
-  private final String dataLocation_;
-  private final String schemaLocation_;
-  private final String reason_;
-  }
+
+    @Override
+    public String toString() {
+        String location =
+                Optional.of(getLocation())
+                        .filter(loc -> !loc.isEmpty())
+                        .map(loc -> String.format("%s: ", loc))
+                        .orElse("");
+
+        return String.format("%s%s", location, getReason());
+    }
+
+    private final String dataLocation_;
+    private final String schemaLocation_;
+    private final String reason_;
+}
