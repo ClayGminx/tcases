@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -15,36 +15,31 @@ import java.util.Map;
  * into Java source for JUnit tests.
  *
  */
-public class TestDefToJUnitFilter extends TransformFilter
-  {
-  /**
-   * Creates a new TestDefToJUnitFilter object.
-   */
-  public TestDefToJUnitFilter()
-    {
-    super( getTransformDef());
-    }
-  
-  /**
-   * Creates a new TestDefToJUnitFilter object.
-   */
-  public TestDefToJUnitFilter( Map<String,Object> params)
-    {
-    super( getTransformDef(), params);
+public class TestDefToJUnitFilter extends TransformFilter {
+    /**
+     * Creates a new TestDefToJUnitFilter object.
+     */
+    public TestDefToJUnitFilter() {
+        super(getTransformDef());
     }
 
-  /**
-   * Returns the XSLT source stream for this filter.
-   */
-  private static InputStream getTransformDef()
-    {
-    String resource = "/testDef2Junit.xsl";
-    InputStream resourceStream = TestDefToJUnitFilter.class.getResourceAsStream( resource);
-    if( resourceStream == null)
-      {
-      throw new RuntimeException( "Can't locate resource=" + resource);
-      }
-    
-    return resourceStream;
+    /**
+     * Creates a new TestDefToJUnitFilter object.
+     */
+    public TestDefToJUnitFilter(Map<String, Object> params) {
+        super(getTransformDef(), params);
     }
-  }
+
+    /**
+     * Returns the XSLT source stream for this filter.
+     */
+    private static InputStream getTransformDef() {
+        String resource = "/testDef2Junit.xsl";
+        InputStream resourceStream = TestDefToJUnitFilter.class.getResourceAsStream(resource);
+        if (resourceStream == null) {
+            throw new RuntimeException("Can't locate resource=" + resource);
+        }
+
+        return resourceStream;
+    }
+}
