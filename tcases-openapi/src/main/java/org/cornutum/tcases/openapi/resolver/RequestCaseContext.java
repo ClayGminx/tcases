@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -12,14 +12,12 @@ import org.cornutum.tcases.util.ExecutionContext;
 /**
  * Provides a context for exceptions that occur when processing {@link org.cornutum.tcases.openapi.resolver.RequestCase} definitions.
  */
-public class RequestCaseContext extends ExecutionContext<RequestCaseException>
-  {
-  /**
-   * Returns an exception to throw for the given failure.
-   */
-  @Override
-  protected RequestCaseException whenFailure( Throwable e)
-    {
-    return new RequestCaseException( getLocation(), e);
+public class RequestCaseContext extends ExecutionContext<RequestCaseException> {
+    /**
+     * Returns an exception to throw for the given failure.
+     */
+    @Override
+    protected RequestCaseException whenFailure(Throwable e) {
+        return new RequestCaseException(getLocation(), e);
     }
-  }
+}

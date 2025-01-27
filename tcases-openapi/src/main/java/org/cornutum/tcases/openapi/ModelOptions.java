@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2019, Cornutum Project
 //                             www.cornutum.org
@@ -16,241 +16,212 @@ import java.util.Optional;
 /**
  * Defines options used to generate Tcases models from OpenAPI models.
  */
-public class ModelOptions
-  {
-  /**
-   * Defines the source of API input definitions.
-   */
-  public enum Source
-    {
-      /**
-       * Derive the API input model from the examples defined by the OpenAPI definition.
-       */
-      EXAMPLES,
+public class ModelOptions {
+    /**
+     * Defines the source of API input definitions.
+     */
+    public enum Source {
+        /**
+         * Derive the API input model from the examples defined by the OpenAPI definition.
+         */
+        EXAMPLES,
 
-      /**
-       * Derive the API input model from the schemas defined by the OpenAPI definition.
-       */
-      SCHEMAS
-    };
-
-  /**
-   * Creates a new ModelOptions instance.
-   */
-  public ModelOptions()
-    {
-    setConditionNotifier( ModelConditionNotifier.log());
-    setSource( Source.SCHEMAS);
-    setServerSelector( ServerSelector.atIndex(0));
+        /**
+         * Derive the API input model from the schemas defined by the OpenAPI definition.
+         */
+        SCHEMAS
     }
 
-  /**
-   * Changes the {@link Notifier} that reports conditions found when creating a Tcases model from an OpenAPI model.
-   */
-  public void setConditionNotifier( Notifier notifier)
-    {
-    notifier_ = Optional.ofNullable( notifier).orElse( Notifier.ignore());
+    ;
+
+    /**
+     * Creates a new ModelOptions instance.
+     */
+    public ModelOptions() {
+        setConditionNotifier(ModelConditionNotifier.log());
+        setSource(Source.SCHEMAS);
+        setServerSelector(ServerSelector.atIndex(0));
     }
 
-  /**
-   * Returns the {@link Notifier} that reports conditions found when creating a Tcases model from an OpenAPI model.
-   */
-  public Notifier getConditionNotifier()
-    {
-    return notifier_;
+    /**
+     * Changes the {@link Notifier} that reports conditions found when creating a Tcases model from an OpenAPI model.
+     */
+    public void setConditionNotifier(Notifier notifier) {
+        notifier_ = Optional.ofNullable(notifier).orElse(Notifier.ignore());
     }
 
-  /**
-   * Changes if the API will strictly enforce the exclusion of "readOnly" properties from requests. 
-   */
-  public void setReadOnlyEnforced( boolean enforced)
-    {
-    readOnlyEnforced_ = enforced;
+    /**
+     * Returns the {@link Notifier} that reports conditions found when creating a Tcases model from an OpenAPI model.
+     */
+    public Notifier getConditionNotifier() {
+        return notifier_;
     }
 
-  /**
-   * Returns if the API will strictly enforce the exclusion of "readOnly" properties from requests. 
-   */
-  public boolean isReadOnlyEnforced()
-    {
-    return readOnlyEnforced_;
+    /**
+     * Changes if the API will strictly enforce the exclusion of "readOnly" properties from requests.
+     */
+    public void setReadOnlyEnforced(boolean enforced) {
+        readOnlyEnforced_ = enforced;
     }
 
-  /**
-   * Changes if the API will strictly enforce the exclusion of "writeOnly" properties from responses. 
-   */
-  public void setWriteOnlyEnforced( boolean enforced)
-    {
-    writeOnlyEnforced_ = enforced;
+    /**
+     * Returns if the API will strictly enforce the exclusion of "readOnly" properties from requests.
+     */
+    public boolean isReadOnlyEnforced() {
+        return readOnlyEnforced_;
     }
 
-  /**
-   * Returns if the API will strictly enforce the exclusion of "writeOnly" properties from responses. 
-   */
-  public boolean isWriteOnlyEnforced()
-    {
-    return writeOnlyEnforced_;
+    /**
+     * Changes if the API will strictly enforce the exclusion of "writeOnly" properties from responses.
+     */
+    public void setWriteOnlyEnforced(boolean enforced) {
+        writeOnlyEnforced_ = enforced;
     }
 
-  /**
-   * Changes the source of API input definitions.
-   */
-  public void setSource( Source source)
-    {
-    source_ = source;
+    /**
+     * Returns if the API will strictly enforce the exclusion of "writeOnly" properties from responses.
+     */
+    public boolean isWriteOnlyEnforced() {
+        return writeOnlyEnforced_;
     }
 
-  /**
-   * Returns the source of API input definitions.
-   */
-  public Source getSource()
-    {
-    return source_;
+    /**
+     * Changes the source of API input definitions.
+     */
+    public void setSource(Source source) {
+        source_ = source;
     }
 
-  /**
-   * Changes the URI specifed for the API server.
-   */
-  public void setServerUri( URI uri)
-    {
-    serverUri_ = uri;
+    /**
+     * Returns the source of API input definitions.
+     */
+    public Source getSource() {
+        return source_;
     }
 
-  /**
-   * Returns the URI specifed for the API server.
-   */
-  public URI getServerUri()
-    {
-    return serverUri_;
+    /**
+     * Changes the URI specifed for the API server.
+     */
+    public void setServerUri(URI uri) {
+        serverUri_ = uri;
     }
 
-  /**
-   * Changes the {@link ServerSelector} used to select the API server for API input definitions.
-   */
-  public void setServerSelector( ServerSelector serverSelector)
-    {
-    serverSelector_ = serverSelector;
+    /**
+     * Returns the URI specifed for the API server.
+     */
+    public URI getServerUri() {
+        return serverUri_;
     }
 
-  /**
-   * Returns the {@link ServerSelector} used to select the API server for API input definitions.
-   */
-  public ServerSelector getServerSelector()
-    {
-    return serverSelector_;
+    /**
+     * Changes the {@link ServerSelector} used to select the API server for API input definitions.
+     */
+    public void setServerSelector(ServerSelector serverSelector) {
+        serverSelector_ = serverSelector;
     }
 
-  /**
-   * Returns a new ModelOptions builder.
-   */
-  public static Builder builder()
-    {
-    return builder( null);
+    /**
+     * Returns the {@link ServerSelector} used to select the API server for API input definitions.
+     */
+    public ServerSelector getServerSelector() {
+        return serverSelector_;
     }
 
-  /**
-   * Returns a new ModelOptions builder.
-   */
-  public static Builder builder( ModelOptions defaults)
-    {
-    return new Builder( defaults);
+    /**
+     * Returns a new ModelOptions builder.
+     */
+    public static Builder builder() {
+        return builder(null);
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( "source", getSource())
-      .append( "conditionNotifier", getConditionNotifier())
-      .append( "readOnlyEnforced", isReadOnlyEnforced())
-      .append( "writeOnlyEnforced", isWriteOnlyEnforced())
-      .append( "server", Optional.ofNullable( String.valueOf( getServerUri())).orElse( String.valueOf( getServerSelector())))
-      .toString();
+    /**
+     * Returns a new ModelOptions builder.
+     */
+    public static Builder builder(ModelOptions defaults) {
+        return new Builder(defaults);
     }
-  
-  /**
-   * Builds a new {@link ModelOptions} instance.
-   */
-  public static class Builder
-    {
-    public Builder()
-      {
-      this( null);
-      }
 
-    public Builder( ModelOptions defaults)
-      {
-      modelOptions_ = new ModelOptions();
-      if( defaults != null)
-        {
-        notifier( defaults.getConditionNotifier())
-        .readOnlyEnforced( defaults.isReadOnlyEnforced())
-        .writeOnlyEnforced( defaults.isWriteOnlyEnforced())
-        .source( defaults.getSource())
-        .serverUri( defaults.getServerUri())
-        .serverSelector( defaults.getServerSelector());
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append("source", getSource())
+                        .append("conditionNotifier", getConditionNotifier())
+                        .append("readOnlyEnforced", isReadOnlyEnforced())
+                        .append("writeOnlyEnforced", isWriteOnlyEnforced())
+                        .append("server", Optional.ofNullable(String.valueOf(getServerUri())).orElse(String.valueOf(getServerSelector())))
+                        .toString();
+    }
+
+    /**
+     * Builds a new {@link ModelOptions} instance.
+     */
+    public static class Builder {
+        public Builder() {
+            this(null);
         }
-      }
 
-    public Builder notifier( Notifier notifier)
-      {
-      modelOptions_.setConditionNotifier( notifier);
-      return this;
-      }
+        public Builder(ModelOptions defaults) {
+            modelOptions_ = new ModelOptions();
+            if (defaults != null) {
+                notifier(defaults.getConditionNotifier())
+                        .readOnlyEnforced(defaults.isReadOnlyEnforced())
+                        .writeOnlyEnforced(defaults.isWriteOnlyEnforced())
+                        .source(defaults.getSource())
+                        .serverUri(defaults.getServerUri())
+                        .serverSelector(defaults.getServerSelector());
+            }
+        }
 
-    public Builder readOnlyEnforced( boolean enforced)
-      {
-      modelOptions_.setReadOnlyEnforced( enforced);
-      return this;
-      }
+        public Builder notifier(Notifier notifier) {
+            modelOptions_.setConditionNotifier(notifier);
+            return this;
+        }
 
-    public Builder readOnlyEnforced()
-      {
-      return readOnlyEnforced( true);
-      }
+        public Builder readOnlyEnforced(boolean enforced) {
+            modelOptions_.setReadOnlyEnforced(enforced);
+            return this;
+        }
 
-    public Builder writeOnlyEnforced( boolean enforced)
-      {
-      modelOptions_.setWriteOnlyEnforced( enforced);
-      return this;
-      }
+        public Builder readOnlyEnforced() {
+            return readOnlyEnforced(true);
+        }
 
-    public Builder writeOnlyEnforced()
-      {
-      return writeOnlyEnforced( true);
-      }
+        public Builder writeOnlyEnforced(boolean enforced) {
+            modelOptions_.setWriteOnlyEnforced(enforced);
+            return this;
+        }
 
-    public Builder source( Source source)
-      {
-      modelOptions_.setSource( source);
-      return this;
-      }
+        public Builder writeOnlyEnforced() {
+            return writeOnlyEnforced(true);
+        }
 
-    public Builder serverUri( URI uri)
-      {
-      modelOptions_.setServerUri( uri);
-      return this;
-      }
+        public Builder source(Source source) {
+            modelOptions_.setSource(source);
+            return this;
+        }
 
-    public Builder serverSelector( ServerSelector serverSelector)
-      {
-      modelOptions_.setServerSelector( serverSelector);
-      return this;
-      }
+        public Builder serverUri(URI uri) {
+            modelOptions_.setServerUri(uri);
+            return this;
+        }
 
-    public ModelOptions build()
-      {
-      return modelOptions_;
-      }
-      
-    private ModelOptions modelOptions_;
+        public Builder serverSelector(ServerSelector serverSelector) {
+            modelOptions_.setServerSelector(serverSelector);
+            return this;
+        }
+
+        public ModelOptions build() {
+            return modelOptions_;
+        }
+
+        private ModelOptions modelOptions_;
     }
-  
-  private Notifier notifier_;
-  private boolean readOnlyEnforced_;
-  private boolean writeOnlyEnforced_;
-  private Source source_;
-  private URI serverUri_;
-  private ServerSelector serverSelector_;
-  }
+
+    private Notifier notifier_;
+    private boolean readOnlyEnforced_;
+    private boolean writeOnlyEnforced_;
+    private Source source_;
+    private URI serverUri_;
+    private ServerSelector serverSelector_;
+}
