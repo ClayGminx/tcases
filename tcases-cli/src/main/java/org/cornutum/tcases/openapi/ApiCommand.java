@@ -3,10 +3,11 @@
 //                    Copyright 2019, Cornutum Project
 //                             www.cornutum.org
 //
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 
 package org.cornutum.tcases.openapi;
 
+import org.apache.commons.lang3.StringUtils;
 import org.cornutum.tcases.HelpException;
 import org.cornutum.tcases.SystemInputDef;
 import org.cornutum.tcases.Tcases;
@@ -20,14 +21,8 @@ import org.cornutum.tcases.openapi.resolver.RequestCaseConditionNotifier;
 import org.cornutum.tcases.resolve.ResolverContext;
 import org.cornutum.tcases.util.MapBuilder;
 import org.cornutum.tcases.util.Notifier;
-
-import static org.cornutum.tcases.CommandUtils.*;
-
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.commons.io.FilenameUtils.getBaseName;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +31,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+
+import static org.apache.commons.io.FilenameUtils.getBaseName;
+import static org.cornutum.tcases.CommandUtils.*;
 
 /**
  * Generates input models and test models for API clients and servers, based on an OpenAPI v3 compliant API definition.
