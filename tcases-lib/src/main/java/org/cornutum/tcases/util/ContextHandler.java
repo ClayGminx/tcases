@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2022, Cornutum Project
 //                             www.cornutum.org
@@ -12,87 +12,76 @@ import java.util.function.Supplier;
 /**
  * Base class for objects that use an {@link ExecutionNotifier} to handle execution conditions.
  */
-public abstract class ContextHandler<C extends ExecutionNotifier<?>>
-  {
-  /**
-   * Creates a new ContextHandler instance.
-   */
-  protected ContextHandler( C context)
-    {
-    context_ = context;
-    }
-  
-  /**
-   * Changes the condition notifier for this reporter.
-   */
-  public void setNotifier( Notifier notifier)
-    {
-    getContext().setNotifier( notifier);
+public abstract class ContextHandler<C extends ExecutionNotifier<?>> {
+    /**
+     * Creates a new ContextHandler instance.
+     */
+    protected ContextHandler(C context) {
+        context_ = context;
     }
 
-  /**
-   * Returns the condition notifier for this reporter.
-   */
-  public Notifier getNotifier()
-    {
-    return getContext().getNotifier();
+    /**
+     * Changes the condition notifier for this reporter.
+     */
+    public void setNotifier(Notifier notifier) {
+        getContext().setNotifier(notifier);
     }
 
-  /**
-   * Returns the execution context for this reporter.
-   */
-  public C getContext()
-    {
-    return context_;
+    /**
+     * Returns the condition notifier for this reporter.
+     */
+    public Notifier getNotifier() {
+        return getContext().getNotifier();
     }
 
-  /**
-   * Reports a warning condition
-   */
-  protected void notifyWarning( String reason)
-    {
-    getContext().warn( reason);
+    /**
+     * Returns the execution context for this reporter.
+     */
+    public C getContext() {
+        return context_;
     }
 
-  /**
-   * Reports a warning condition at the given location.
-   */
-  protected void notifyWarning( String[] location, String reason)
-    {
-    getNotifier().warn( location, reason);
+    /**
+     * Reports a warning condition
+     */
+    protected void notifyWarning(String reason) {
+        getContext().warn(reason);
     }
 
-  /**
-   * Reports an error condition
-   */
-  protected void notifyError( String reason, String resolution)
-    {
-    getContext().error( reason, resolution);
+    /**
+     * Reports a warning condition at the given location.
+     */
+    protected void notifyWarning(String[] location, String reason) {
+        getNotifier().warn(location, reason);
     }
 
-  /**
-   * Reports an error condition at the given location.
-   */
-  protected void notifyError( String[] location, String reason, String resolution)
-    {
-    getNotifier().error( location, reason, resolution);
+    /**
+     * Reports an error condition
+     */
+    protected void notifyError(String reason, String resolution) {
+        getContext().error(reason, resolution);
     }
 
-  /**
-   * Returns the result of the given supplier within the specified context.
-   */
-  protected <T> T resultFor( String context, Supplier<T> supplier)
-    {
-    return getContext().resultFor( context, supplier);
+    /**
+     * Reports an error condition at the given location.
+     */
+    protected void notifyError(String[] location, String reason, String resolution) {
+        getNotifier().error(location, reason, resolution);
     }
 
-  /**
-   * Performs the given action within the specified context.
-   */
-  protected void doFor( String context, Runnable action)
-    {
-    getContext().doFor( context, action);
+    /**
+     * Returns the result of the given supplier within the specified context.
+     */
+    protected <T> T resultFor(String context, Supplier<T> supplier) {
+        return getContext().resultFor(context, supplier);
     }
 
-  private final C context_;
-  }
+    /**
+     * Performs the given action within the specified context.
+     */
+    protected void doFor(String context, Runnable action) {
+        getContext().doFor(context, action);
+    }
+
+    private final C context_;
+}

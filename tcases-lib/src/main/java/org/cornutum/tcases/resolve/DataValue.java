@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -16,149 +16,133 @@ import java.util.Optional;
 /**
  * Represents a generated data value for a test case.
  */
-public class DataValue<T>
-  {
-  public static enum Type
-    {
-    ARRAY, BOOLEAN, INTEGER, NULL, NUMBER, OBJECT, STRING;
+public class DataValue<T> {
+    public static enum Type {
+        ARRAY, BOOLEAN, INTEGER, NULL, NUMBER, OBJECT, STRING;
+
+        /**
+         * Returns true if this type designates a composite value
+         */
+        public boolean isComposite() {
+            return this == ARRAY || this == OBJECT;
+        }
+
+        /**
+         * Returns true if this type designates a numeric value
+         */
+        public boolean isNumeric() {
+            return this == INTEGER || this == NUMBER;
+        }
+
+        /**
+         * Returns the set containing only the specified type.
+         */
+        public static Type[] only(Type type) {
+            return new Type[]{type};
+        }
+
+        /**
+         * Returns the set of all non-null types except for the specified excluded type.
+         */
+        public static Type[] not(Type... excluded) {
+            return
+                    Arrays.stream(Type.values())
+                            .filter(type -> {
+                                return
+                                        !type.equals(NULL)
+                                                && Arrays.stream(excluded).noneMatch(e -> type.equals(e) || (type.equals(INTEGER) && e == NUMBER));
+                            })
+                            .toArray(Type[]::new);
+        }
+
+        /**
+         * Returns the set of all non-null types.
+         */
+        public static Type[] any() {
+            return not(NULL);
+        }
+    }
 
     /**
-     * Returns true if this type designates a composite value
+     * Creates a new DataValue instance.
      */
-    public boolean isComposite()
-      {
-      return this == ARRAY || this == OBJECT;
-      }
+    public DataValue(T value, Type type, String format) {
+        value_ = value;
+        type_ = type;
+        format_ = format;
+    }
 
     /**
-     * Returns true if this type designates a numeric value
+     * Returns the data value.
      */
-    public boolean isNumeric()
-      {
-      return this == INTEGER || this == NUMBER;
-      }
+    public T getValue() {
+        return value_;
+    }
 
     /**
-     * Returns the set containing only the specified type.
+     * Returns the data type.
      */
-    public static Type[] only( Type type)
-      {
-      return new Type[]{ type };
-      }
-    
+    public Type getType() {
+        return type_;
+    }
+
     /**
-     * Returns the set of all non-null types except for the specified excluded type.
+     * Returns the data format.
      */
-    public static Type[] not( Type... excluded)
-      {
-      return
-        Arrays.stream( Type.values())
-        .filter( type -> {
-          return
-            !type.equals( NULL)
-            && Arrays.stream( excluded).noneMatch( e -> type.equals( e) || (type.equals( INTEGER) && e == NUMBER));
-          })
-        .toArray( Type[]::new);
-      }
-    
+    public String getFormat() {
+        return format_;
+    }
+
     /**
-     * Returns the set of all non-null types.
+     * Creates a new DataValue instance.
      */
-    public static Type[] any()
-      {
-      return not( NULL);
-      }
+    public static <T> DataValue<T> of(T value, Type type, String format) {
+        return new DataValue<T>(value, type, format);
     }
 
-  /**
-   * Creates a new DataValue instance.
-   */
-  public DataValue( T value, Type type, String format)
-    {
-    value_ = value;
-    type_ = type;
-    format_ = format;
+    /**
+     * Implements the Visitor pattern for this data value.
+     */
+    public void accept(DataValueVisitor visitor) {
+        throw new UnsupportedOperationException("Can't visit a generic DataValue");
     }
 
-  /**
-   * Returns the data value.
-   */
-  public T getValue()
-    {
-    return value_;
-    }
-  
-  /**
-   * Returns the data type.
-   */
-  public Type getType()
-    {
-    return type_;
-    }
-  
-  /**
-   * Returns the data format.
-   */
-  public String getFormat()
-    {
-    return format_;
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append(getValue())
+                        .toString();
     }
 
-  /**
-   * Creates a new DataValue instance.
-   */
-  public static <T> DataValue<T> of( T value, Type type, String format)
-    {
-    return new DataValue<T>( value, type, format);
+    @Override
+    public boolean equals(Object object) {
+        @SuppressWarnings("unchecked")
+        DataValue<T> other =
+                Optional.ofNullable(object)
+                        .map(Object::getClass)
+                        .filter(otherClass -> getClass().isAssignableFrom(otherClass))
+                        .map(otherClass -> (DataValue<T>) object)
+                        .orElse(null);
+
+        return
+                other != null
+                        && Objects.equals(other.getValue(), getValue())
+                        && Objects.equals(other.getType(), getType())
+                        && Objects.equals(other.getFormat(), getFormat());
     }
 
-  /**
-   * Implements the Visitor pattern for this data value.
-   */
-  public void accept( DataValueVisitor visitor)
-    {
-    throw new UnsupportedOperationException( "Can't visit a generic DataValue");
+    @Override
+    public int hashCode() {
+        return
+                DataValue.class.hashCode()
+                        ^ Objects.hashCode(getValue())
+                        ^ Objects.hashCode(getType())
+                        ^ Objects.hashCode(getFormat());
+
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( getValue())
-      .toString();
-    }
-
-  @Override
-  public boolean equals( Object object)
-    {
-    @SuppressWarnings("unchecked")
-    DataValue<T> other =
-      Optional.ofNullable( object)
-      .map( Object::getClass)
-      .filter( otherClass -> getClass().isAssignableFrom( otherClass))
-      .map( otherClass -> (DataValue<T>) object)
-      .orElse( null);
-      
-    return
-      other != null
-      && Objects.equals( other.getValue(), getValue())
-      && Objects.equals( other.getType(), getType())
-      && Objects.equals( other.getFormat(), getFormat());
-    }
-
-  @Override
-  public int hashCode()
-    {
-    return
-      DataValue.class.hashCode()
-      ^ Objects.hashCode( getValue())
-      ^ Objects.hashCode( getType())
-      ^ Objects.hashCode( getFormat());
-      
-    }
-
-  private final T value_;
-  private final Type type_;
-  private final String format_;
-  }
+    private final T value_;
+    private final Type type_;
+    private final String format_;
+}

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -15,104 +15,94 @@ import static org.cornutum.tcases.util.CollectionUtils.toStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
+
 import static java.util.stream.Collectors.toList;
 
 /**
  * Defines an enumerated value set.
  */
-public abstract class EnumDomain<T> extends AbstractValueDomain<T>
-  {
-  /**
-   * Creates a new EnumDomain instance.
-   */
-  protected EnumDomain( Type type, Iterable<String> enums)
-    {
-    this( type);
-    setEnums( enums);
-    }
-  
-  /**
-   * Creates a new EnumDomain instance.
-   */
-  protected EnumDomain( Type type, Collection<T> enums)
-    {
-    this( type);
-    setEnums( enums.stream());
-    }
-  
-  /**
-   * Creates a new EnumDomain instance.
-   */
-  private EnumDomain( Type type)
-    {
-    type_ = type;
+public abstract class EnumDomain<T> extends AbstractValueDomain<T> {
+    /**
+     * Creates a new EnumDomain instance.
+     */
+    protected EnumDomain(Type type, Iterable<String> enums) {
+        this(type);
+        setEnums(enums);
     }
 
-  /**
-   * Returns the enumerated values for this domain.
-   */
-  public Iterable<T> getEnums()
-    {
-    return enums_;
+    /**
+     * Creates a new EnumDomain instance.
+     */
+    protected EnumDomain(Type type, Collection<T> enums) {
+        this(type);
+        setEnums(enums.stream());
     }
 
-  /**
-   * Changes the enumerated values for this domain.
-   */
-  private void setEnums( Iterable<String> enums)
-    {
-    setEnums( toStream( enums).map( this::valueOf));
+    /**
+     * Creates a new EnumDomain instance.
+     */
+    private EnumDomain(Type type) {
+        type_ = type;
     }
 
-  /**
-   * Changes the enumerated values for this domain.
-   */
-  private void setEnums( Stream<T> enums)
-    {
-    enums_ = enums.distinct().collect( toList());
+    /**
+     * Returns the enumerated values for this domain.
+     */
+    public Iterable<T> getEnums() {
+        return enums_;
     }
 
-  /**
-   * Returns the value represented by the given string.
-   */
-  protected abstract T valueOf( String value);
-
-  /**
-   * Returns a random sequence of values from this domain.
-   */
-  @Override
-  public Stream<DataValue<T>> values( ResolverContext context)
-    {
-    return Stream.generate( () -> dataValueOf( enums_.get( context.getRandom().nextInt( enums_.size()))));
+    /**
+     * Changes the enumerated values for this domain.
+     */
+    private void setEnums(Iterable<String> enums) {
+        setEnums(toStream(enums).map(this::valueOf));
     }
 
-  /**
-   * Returns true if the given value belongs to this domain.
-   */
-  @Override
-  public boolean contains( T value)
-    {
-    return enums_.contains( value);
+    /**
+     * Changes the enumerated values for this domain.
+     */
+    private void setEnums(Stream<T> enums) {
+        enums_ = enums.distinct().collect(toList());
     }
 
-  /**
-   * Return the type(s) of values that belong to this domain.
-   */
-  @Override
-  public Type[] getTypes()
-    {
-    return Type.only( type_);
+    /**
+     * Returns the value represented by the given string.
+     */
+    protected abstract T valueOf(String value);
+
+    /**
+     * Returns a random sequence of values from this domain.
+     */
+    @Override
+    public Stream<DataValue<T>> values(ResolverContext context) {
+        return Stream.generate(() -> dataValueOf(enums_.get(context.getRandom().nextInt(enums_.size()))));
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( getEnums())
-      .toString();
+    /**
+     * Returns true if the given value belongs to this domain.
+     */
+    @Override
+    public boolean contains(T value) {
+        return enums_.contains(value);
     }
 
-  private final Type type_;
-  private List<T> enums_;
-  }
+    /**
+     * Return the type(s) of values that belong to this domain.
+     */
+    @Override
+    public Type[] getTypes() {
+        return Type.only(type_);
+    }
+
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append(getEnums())
+                        .toString();
+    }
+
+    private final Type type_;
+    private List<T> enums_;
+}

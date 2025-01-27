@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -16,22 +16,21 @@ import java.util.List;
  * Generates {@link TestCase test cases} for a {@link FunctionInputDef function}.
  *
  */
-public interface ITestCaseGenerator extends CloneableType<ITestCaseGenerator>
-  {
-  /**
-   * Changes the random number sequence seed for this generator.
-   */
-  void setRandomSeed( Long seed);
+public interface ITestCaseGenerator extends CloneableType<ITestCaseGenerator> {
+    /**
+     * Changes the random number sequence seed for this generator.
+     */
+    void setRandomSeed(Long seed);
 
-  /**
-   * Returns the random number sequence seed for this generator.
-   */
-  Long getRandomSeed();
+    /**
+     * Returns the random number sequence seed for this generator.
+     */
+    Long getRandomSeed();
 
-  /**
-   * Returns a set of {@link TestCase test cases} for the given function input definition.
-   * If the given base test definition is non-null, returns a set of new test cases
-   * that extend the base tests.
-   */
-  List<ITestCaseDef> getTests( FunctionInputDef inputDef, FunctionTestDef baseTests);  
-  }
+    /**
+     * Returns a set of {@link TestCase test cases} for the given function input definition.
+     * If the given base test definition is non-null, returns a set of new test cases
+     * that extend the base tests.
+     */
+    List<ITestCaseDef> getTests(FunctionInputDef inputDef, FunctionTestDef baseTests);
+}

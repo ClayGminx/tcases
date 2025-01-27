@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -22,185 +22,167 @@ import java.util.Set;
  * more {@link IAssertion assertions}.
  *
  */
-public class Disjunction implements IDisjunct
-  {
-  /**
-   * Creates a new Disjunction instance.
-   */
-  public Disjunction( IAssertion ... assertions)
-    {
-    for( int i = 0; i < assertions.length; i++)
-      {
-      add( assertions[i]);
-      }
-    }
-  
-  /**
-   * Creates a new Disjunction instance.
-   */
-  public Disjunction( IDisjunct ... disjuncts)
-    {
-    for( int i = 0; i < disjuncts.length; i++)
-      {
-      add( disjuncts[i]);
-      }
-    }
-  
-  /**
-   * Returns true if this condition is satisfied by the given test case properties.
-   */
-  @Override
-  public boolean satisfied( PropertySet properties)
-    {
-    boolean isSatisfied;
-    Iterator<IAssertion> assertions;
-    
-    for( assertions = getAssertions(),
-           isSatisfied = !assertions.hasNext();
-
-         !isSatisfied
-           && assertions.hasNext();
-
-         isSatisfied = assertions.next().satisfied( properties));
-    
-    return isSatisfied;
+public class Disjunction implements IDisjunct {
+    /**
+     * Creates a new Disjunction instance.
+     */
+    public Disjunction(IAssertion... assertions) {
+        for (int i = 0; i < assertions.length; i++) {
+            add(assertions[i]);
+        }
     }
 
-  /**
-   * Returns true if this condition is compatible with the given test case properties.
-   * A condition is <em>"compatible"</em> with these properties if it is already satisfied
-   * or if it could be satisfied with the addition of more properties.
-   */
-  @Override
-  public boolean compatible( PropertySet properties)
-    {
-    boolean isCompatible;
-    Iterator<IAssertion> assertions;
-    
-    for( assertions = getAssertions(),
-           isCompatible = !assertions.hasNext();
-
-         !isCompatible
-           && assertions.hasNext();
-
-         isCompatible = assertions.next().compatible( properties));
-    
-    return isCompatible;
-    }
-  
-  /**
-   * Implements the Visitor pattern for this condition.
-   */
-  @Override
-  public void accept( IConditionVisitor visitor)
-    {
-    visitor.visit( this);
-    }
-  
-  /**
-   * Adds an assertion to this disjunction.
-   */
-  public Disjunction add( IAssertion assertion)
-    {
-    assertions_.add( assertion);
-    return this;
-    }
-  
-  /**
-   * Adds all assertions for the given IDisjunct to this disjunction.
-   */
-  public Disjunction add( IDisjunct disjunct)
-    {
-    for( Iterator<IAssertion> assertions = disjunct.getAssertions();
-         assertions.hasNext();)
-      {
-      add( assertions.next());
-      }
-    return this;
+    /**
+     * Creates a new Disjunction instance.
+     */
+    public Disjunction(IDisjunct... disjuncts) {
+        for (int i = 0; i < disjuncts.length; i++) {
+            add(disjuncts[i]);
+        }
     }
 
-  /**
-   * Removes an assertion from this disjunction.
-   */
-  public Disjunction remove( IAssertion assertion)
-    {
-    assertions_.remove( assertion);
-    return this;
+    /**
+     * Returns true if this condition is satisfied by the given test case properties.
+     */
+    @Override
+    public boolean satisfied(PropertySet properties) {
+        boolean isSatisfied;
+        Iterator<IAssertion> assertions;
+
+        for (assertions = getAssertions(),
+                     isSatisfied = !assertions.hasNext();
+
+             !isSatisfied
+                     && assertions.hasNext();
+
+             isSatisfied = assertions.next().satisfied(properties))
+            ;
+
+        return isSatisfied;
     }
 
-  /**
-   * Returns the assertions in this disjunction.
-   */
-  @Override
-  public Iterator<IAssertion> getAssertions()
-    {
-    return assertions_.iterator();
+    /**
+     * Returns true if this condition is compatible with the given test case properties.
+     * A condition is <em>"compatible"</em> with these properties if it is already satisfied
+     * or if it could be satisfied with the addition of more properties.
+     */
+    @Override
+    public boolean compatible(PropertySet properties) {
+        boolean isCompatible;
+        Iterator<IAssertion> assertions;
+
+        for (assertions = getAssertions(),
+                     isCompatible = !assertions.hasNext();
+
+             !isCompatible
+                     && assertions.hasNext();
+
+             isCompatible = assertions.next().compatible(properties))
+            ;
+
+        return isCompatible;
     }
 
-  /**
-   * Returns true if the given assertion is a member of this disjunction.
-   */
-  @Override
-  public boolean contains( IAssertion assertion)
-    {
-    return assertions_.contains( assertion);
+    /**
+     * Implements the Visitor pattern for this condition.
+     */
+    @Override
+    public void accept(IConditionVisitor visitor) {
+        visitor.visit(this);
     }
 
-  /**
-   * Returns the number of assertions for this disjunction.
-   */
-  @Override
-  public int getAssertionCount()
-    {
-    return assertions_.size();
+    /**
+     * Adds an assertion to this disjunction.
+     */
+    public Disjunction add(IAssertion assertion) {
+        assertions_.add(assertion);
+        return this;
     }
 
-  /**
-   * Returns the disjuncts in this conjunction.
-   */
-  @Override
-  public Iterator<IDisjunct> getDisjuncts()
-    {
-    return new SingletonIterator<IDisjunct>( this);
+    /**
+     * Adds all assertions for the given IDisjunct to this disjunction.
+     */
+    public Disjunction add(IDisjunct disjunct) {
+        for (Iterator<IAssertion> assertions = disjunct.getAssertions();
+             assertions.hasNext(); ) {
+            add(assertions.next());
+        }
+        return this;
     }
 
-  /**
-   * Returns the number of disjunctions for this conjunction.
-   */
-  @Override
-  public int getDisjunctCount()
-    {
-    return 1;
+    /**
+     * Removes an assertion from this disjunction.
+     */
+    public Disjunction remove(IAssertion assertion) {
+        assertions_.remove(assertion);
+        return this;
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( assertions_)
-      .toString();
+    /**
+     * Returns the assertions in this disjunction.
+     */
+    @Override
+    public Iterator<IAssertion> getAssertions() {
+        return assertions_.iterator();
     }
 
-  @Override
-  public int hashCode()
-    {
-    return assertions_.hashCode();
+    /**
+     * Returns true if the given assertion is a member of this disjunction.
+     */
+    @Override
+    public boolean contains(IAssertion assertion) {
+        return assertions_.contains(assertion);
     }
 
-  @Override
-  public boolean equals( Object object)
-    {
-    IDisjunct other =
-      object != null && object instanceof IDisjunct
-      ? (IDisjunct) object
-      : null;
-    
-    return
-      other != null
-      && assertions_.equals( new HashSet<IDisjunct>( IteratorUtils.toList( other.getAssertions())));
+    /**
+     * Returns the number of assertions for this disjunction.
+     */
+    @Override
+    public int getAssertionCount() {
+        return assertions_.size();
     }
 
-  private Set<IAssertion> assertions_ = new HashSet<IAssertion>();
-  }
+    /**
+     * Returns the disjuncts in this conjunction.
+     */
+    @Override
+    public Iterator<IDisjunct> getDisjuncts() {
+        return new SingletonIterator<IDisjunct>(this);
+    }
+
+    /**
+     * Returns the number of disjunctions for this conjunction.
+     */
+    @Override
+    public int getDisjunctCount() {
+        return 1;
+    }
+
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append(assertions_)
+                        .toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return assertions_.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        IDisjunct other =
+                object != null && object instanceof IDisjunct
+                        ? (IDisjunct) object
+                        : null;
+
+        return
+                other != null
+                        && assertions_.equals(new HashSet<IDisjunct>(IteratorUtils.toList(other.getAssertions())));
+    }
+
+    private Set<IAssertion> assertions_ = new HashSet<IAssertion>();
+}
 

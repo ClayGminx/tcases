@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -17,89 +17,81 @@ import java.util.Iterator;
  * all members of a set of properties.
  *
  */
-public class ContainsAll extends PropertyExpr implements ICondition 
-  {
-  /**
-   * Creates a new ContainsAll object.
-   */
-  public ContainsAll( String ... properties)
-    {
-    super( properties);
+public class ContainsAll extends PropertyExpr implements ICondition {
+    /**
+     * Creates a new ContainsAll object.
+     */
+    public ContainsAll(String... properties) {
+        super(properties);
     }
 
-  /**
-   * Creates a new ContainsAll object.
-   */
-  public ContainsAll( Collection<String> properties)
-    {
-    super( properties);
+    /**
+     * Creates a new ContainsAll object.
+     */
+    public ContainsAll(Collection<String> properties) {
+        super(properties);
     }
 
-  /**
-   * Adds a property to this set.
-   */
-  public ContainsAll add( String property)
-    {
-    super.addProperty( property);    
-    return this;
+    /**
+     * Adds a property to this set.
+     */
+    public ContainsAll add(String property) {
+        super.addProperty(property);
+        return this;
     }
 
-  /**
-   * Adds a set of  properties to this set.
-   */
-  public ContainsAll addAll( Collection<String> properties)
-    {
-    super.addProperties( properties);    
-    return this;
+    /**
+     * Adds a set of  properties to this set.
+     */
+    public ContainsAll addAll(Collection<String> properties) {
+        super.addProperties(properties);
+        return this;
     }
 
-  /**
-   * Removes a property from this set.
-   */
-  public ContainsAll remove( String property)
-    {
-    super.removeProperty( property);    
-    return this;
+    /**
+     * Removes a property from this set.
+     */
+    public ContainsAll remove(String property) {
+        super.removeProperty(property);
+        return this;
     }
 
-  /**
-   * Returns true if this condition is satisfied by the given test case contains.
-   */
-  @Override
-  public boolean satisfied( PropertySet propertySet)
-    {
-    boolean isSatisfied;
-    Iterator<String> properties;
-    
-    for( properties = getProperties(),
-           isSatisfied = true;
+    /**
+     * Returns true if this condition is satisfied by the given test case contains.
+     */
+    @Override
+    public boolean satisfied(PropertySet propertySet) {
+        boolean isSatisfied;
+        Iterator<String> properties;
 
-         isSatisfied
-           && properties.hasNext();
+        for (properties = getProperties(),
+                     isSatisfied = true;
 
-         isSatisfied = propertySet.contains( properties.next()));
-    
-    return isSatisfied;
+             isSatisfied
+                     && properties.hasNext();
+
+             isSatisfied = propertySet.contains(properties.next()))
+            ;
+
+        return isSatisfied;
     }
 
-  /**
-   * Returns true if this condition is compatible with the given test case properties.
-   * A condition is <em>"compatible"</em> with these properties if it is already satisfied
-   * or if it could be satisfied with the addition of more properties.
-   */
-  @Override
-  public boolean compatible( PropertySet properties)
-    {
-    return true;
+    /**
+     * Returns true if this condition is compatible with the given test case properties.
+     * A condition is <em>"compatible"</em> with these properties if it is already satisfied
+     * or if it could be satisfied with the addition of more properties.
+     */
+    @Override
+    public boolean compatible(PropertySet properties) {
+        return true;
     }
-  
-  /**
-   * Implements the Visitor pattern for this condition.
-   */
-  @Override
-  public void accept( IConditionVisitor visitor)
-    {
-    visitor.visit( this);
+
+    /**
+     * Implements the Visitor pattern for this condition.
+     */
+    @Override
+    public void accept(IConditionVisitor visitor) {
+        visitor.visit(this);
     }
-  }
+}
 

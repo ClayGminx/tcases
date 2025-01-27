@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -12,22 +12,19 @@ import org.cornutum.tcases.util.ToString;
 /**
  * Represents a generated time string value for a test case.
  */
-public class DateTimeValue extends StringValue
-  {
-  /**
-   * Creates a new DateTimeValue instance.
-   */
-  public DateTimeValue( String value)
-    {
-    super( value, "date-time");
+public class DateTimeValue extends StringValue {
+    /**
+     * Creates a new DateTimeValue instance.
+     */
+    public DateTimeValue(String value) {
+        super(value, "date-time");
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( getValue())
-      .toString();
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append(getValue())
+                        .toString();
     }
-  }
+}

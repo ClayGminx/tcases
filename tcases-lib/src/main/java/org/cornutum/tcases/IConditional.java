@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -13,11 +13,10 @@ import org.cornutum.tcases.conditions.ICondition;
  * A conditional element.
  *
  */
-public interface IConditional
-  {
-  /**
-   * Returns the condition that defines when this element is applicable.
-   */
-  public ICondition getCondition();
-  }
+public interface IConditional {
+    /**
+     * Returns the condition that defines when this element is applicable.
+     */
+    public ICondition getCondition();
+}
 

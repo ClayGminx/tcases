@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -20,161 +20,143 @@ import java.util.Objects;
  * Defines an individual input variable.
  *
  */
-public class VarDef extends AbstractVarDef
-  {
-  /**
-   * Creates a new VarDef object.
-   */
-  public VarDef()
-    {
-    this( null);
-    }
-  
-  /**
-   * Creates a new VarDef object.
-   */
-  public VarDef( String name)
-    {
-    super( name);
+public class VarDef extends AbstractVarDef {
+    /**
+     * Creates a new VarDef object.
+     */
+    public VarDef() {
+        this(null);
     }
 
-  /**
-   * If this variable has member variables, returns an iterator for the member variable list.
-   * Otherwise, returns null.
-   */
-  @Override
-  public Iterator<IVarDef> getMembers()
-    {
-    return null;
+    /**
+     * Creates a new VarDef object.
+     */
+    public VarDef(String name) {
+        super(name);
     }
 
-  /**
-   * If this variable defines a value set, returns an iterator for the value set.
-   * Otherwise, returns null.
-   */
-  @Override
-  public Iterator<VarValueDef> getValues()
-    {
-    return values_.iterator();
-    }
-  
-  /**
-   * Returns the descendant variable with the given name path, relative to this variable.
-   */
-  @Override
-  public IVarDef find( String... path)
-    {
-    return
-      path == null || path.length == 0
-      ? this
-      : null;
+    /**
+     * If this variable has member variables, returns an iterator for the member variable list.
+     * Otherwise, returns null.
+     */
+    @Override
+    public Iterator<IVarDef> getMembers() {
+        return null;
     }
 
-  /**
-   * Returns an iterator for the set of valid values.
-   */
-  public Iterator<VarValueDef> getValidValues()
-    {
-    return
-      IteratorUtils.filteredIterator(
-        getValues(),
-        VarValueDef::isValid);
+    /**
+     * If this variable defines a value set, returns an iterator for the value set.
+     * Otherwise, returns null.
+     */
+    @Override
+    public Iterator<VarValueDef> getValues() {
+        return values_.iterator();
     }
 
-  /**
-   * Returns an iterator for the set of failure values.
-   */
-  public Iterator<VarValueDef> getFailureValues()
-    {
-    return
-      IteratorUtils.filteredIterator(
-        getValues(),
-        valueDef -> !valueDef.isValid());
+    /**
+     * Returns the descendant variable with the given name path, relative to this variable.
+     */
+    @Override
+    public IVarDef find(String... path) {
+        return
+                path == null || path.length == 0
+                        ? this
+                        : null;
     }
 
-  /**
-   * Adds a value definition for this variable.
-   */
-  public VarDef addValue( VarValueDef value)
-    {
-    assert value != null;
-
-    if( findValue( value.getName()) >= 0)
-      {
-      throw new IllegalStateException( "Value=" + value.getName() + " already defined for variable=" + getPathName());
-      }
-
-    values_.add( value);
-    return this;
+    /**
+     * Returns an iterator for the set of valid values.
+     */
+    public Iterator<VarValueDef> getValidValues() {
+        return
+                IteratorUtils.filteredIterator(
+                        getValues(),
+                        VarValueDef::isValid);
     }
 
-  /**
-   * Removes a value definition from this variable.
-   */
-  public VarDef removeValue( Object name)
-    {
-    int i = findValue( name);
-    if( i >= 0)
-      {
-      values_.remove(i);
-      }
-
-    return this;
+    /**
+     * Returns an iterator for the set of failure values.
+     */
+    public Iterator<VarValueDef> getFailureValues() {
+        return
+                IteratorUtils.filteredIterator(
+                        getValues(),
+                        valueDef -> !valueDef.isValid());
     }
 
-  /**
-   * Returns the value definition with the given name.
-   */
-  public VarValueDef getValue( Object name)
-    {
-    int i = findValue( name);
-    return i >= 0? values_.get(i) : null;
+    /**
+     * Adds a value definition for this variable.
+     */
+    public VarDef addValue(VarValueDef value) {
+        assert value != null;
+
+        if (findValue(value.getName()) >= 0) {
+            throw new IllegalStateException("Value=" + value.getName() + " already defined for variable=" + getPathName());
+        }
+
+        values_.add(value);
+        return this;
     }
 
-  /**
-   * Returns true if the given value can be bound to this variable.
-   */
-  public boolean isApplicable( VarValueDef value)
-    {
-    return
-      value.isNA()
-      ? isOptional()
-      : getValue( value.getName()) != null;
+    /**
+     * Removes a value definition from this variable.
+     */
+    public VarDef removeValue(Object name) {
+        int i = findValue(name);
+        if (i >= 0) {
+            values_.remove(i);
+        }
+
+        return this;
     }
 
-  /**
-   * Returns the index of the value definition with the given name.
-   */
-  protected int findValue( Object name)
-    {
-    int valueCount = values_.size();
-    int i;
-    for( i = 0; i < valueCount && !Objects.equals( name, values_.get(i).getName()); i++);
-    return i < valueCount? i : -1;
+    /**
+     * Returns the value definition with the given name.
+     */
+    public VarValueDef getValue(Object name) {
+        int i = findValue(name);
+        return i >= 0 ? values_.get(i) : null;
     }
 
-  /**
-   * Changes the schema for values bound to this variable.
-   */
-  public void setSchema( Schema schema)
-    {
-    if( schema != null && schema.getConstant() != null)
-      {
-      throw new IllegalStateException( "'const' schema not allowed for a variable definition");
-      }
-    
-    schema_ = schema;
+    /**
+     * Returns true if the given value can be bound to this variable.
+     */
+    public boolean isApplicable(VarValueDef value) {
+        return
+                value.isNA()
+                        ? isOptional()
+                        : getValue(value.getName()) != null;
     }
 
-  /**
-   * Returns the schema for values bound to this variable.
-   */
-  public Schema getSchema()
-    {
-    return schema_;
+    /**
+     * Returns the index of the value definition with the given name.
+     */
+    protected int findValue(Object name) {
+        int valueCount = values_.size();
+        int i;
+        for (i = 0; i < valueCount && !Objects.equals(name, values_.get(i).getName()); i++) ;
+        return i < valueCount ? i : -1;
     }
 
-  private List<VarValueDef> values_ = new ArrayList<VarValueDef>();
-  private Schema schema_;
-  }
+    /**
+     * Changes the schema for values bound to this variable.
+     */
+    public void setSchema(Schema schema) {
+        if (schema != null && schema.getConstant() != null) {
+            throw new IllegalStateException("'const' schema not allowed for a variable definition");
+        }
+
+        schema_ = schema;
+    }
+
+    /**
+     * Returns the schema for values bound to this variable.
+     */
+    public Schema getSchema() {
+        return schema_;
+    }
+
+    private List<VarValueDef> values_ = new ArrayList<VarValueDef>();
+    private Schema schema_;
+}
 

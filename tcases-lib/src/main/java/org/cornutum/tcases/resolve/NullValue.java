@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -12,38 +12,33 @@ import org.cornutum.tcases.util.ToString;
 /**
  * Represents a generated null value for a test case.
  */
-public class NullValue extends DataValue<Object>
-  {
-  /**
-   * Creates a new NullValue instance.
-   */
-  public NullValue()
-    {
-    this( null);
-    }
-  
-  /**
-   * Creates a new NullValue instance.
-   */
-  public NullValue( String format)
-    {
-    super( null, Type.NULL, format);
+public class NullValue extends DataValue<Object> {
+    /**
+     * Creates a new NullValue instance.
+     */
+    public NullValue() {
+        this(null);
     }
 
-  /**
-   * Implements the Visitor pattern for this data value.
-   */
-  @Override
-  public void accept( DataValueVisitor visitor)
-    {
-    visitor.visit( this);
+    /**
+     * Creates a new NullValue instance.
+     */
+    public NullValue(String format) {
+        super(null, Type.NULL, format);
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .toString();
+    /**
+     * Implements the Visitor pattern for this data value.
+     */
+    @Override
+    public void accept(DataValueVisitor visitor) {
+        visitor.visit(this);
     }
-  }
+
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .toString();
+    }
+}

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -15,20 +15,19 @@ import java.util.Iterator;
  * more {@link IAssertion assertions}.
  *
  */
-public interface IDisjunct extends IConjunct
-  {
-  /**
-   * Returns the assertions for this disjunction.
-   */
-  Iterator<IAssertion> getAssertions();
+public interface IDisjunct extends IConjunct {
+    /**
+     * Returns the assertions for this disjunction.
+     */
+    Iterator<IAssertion> getAssertions();
 
-  /**
-   * Returns the number of assertions for this disjunction.
-   */
-  int getAssertionCount();
+    /**
+     * Returns the number of assertions for this disjunction.
+     */
+    int getAssertionCount();
 
-  /**
-   * Returns true if the given assertion is a member of this disjunction.
-   */
-  boolean contains( IAssertion assertion);  
-  }
+    /**
+     * Returns true if the given assertion is a member of this disjunction.
+     */
+    boolean contains(IAssertion assertion);
+}

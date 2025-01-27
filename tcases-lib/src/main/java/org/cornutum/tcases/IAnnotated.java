@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2018, Cornutum Project
 //                             www.cornutum.org
@@ -13,16 +13,15 @@ import java.util.Iterator;
  * An annotated element.
  *
  */
-public interface IAnnotated
-  {
-  /**
-   * Returns the value of the given annotation.
-   */
-  String getAnnotation( String name);
+public interface IAnnotated {
+    /**
+     * Returns the value of the given annotation.
+     */
+    String getAnnotation(String name);
 
-  /**
-   * Returns the list of all annotation names.
-   */
-  Iterator<String> getAnnotations();
-  }
+    /**
+     * Returns the list of all annotation names.
+     */
+    Iterator<String> getAnnotations();
+}
 

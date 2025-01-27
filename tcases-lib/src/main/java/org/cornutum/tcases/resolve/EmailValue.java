@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2020, Cornutum Project
 //                             www.cornutum.org
@@ -12,22 +12,19 @@ import org.cornutum.tcases.util.ToString;
 /**
  * Represents a generated email address value for a test case.
  */
-public class EmailValue extends StringValue
-  {
-  /**
-   * Creates a new EmailValue instance.
-   */
-  public EmailValue( String value)
-    {
-    super( value, "email");
+public class EmailValue extends StringValue {
+    /**
+     * Creates a new EmailValue instance.
+     */
+    public EmailValue(String value) {
+        super(value, "email");
     }
 
-  @Override
-  public String toString()
-    {
-    return
-      ToString.getBuilder( this)
-      .append( getValue())
-      .toString();
+    @Override
+    public String toString() {
+        return
+                ToString.getBuilder(this)
+                        .append(getValue())
+                        .toString();
     }
-  }
+}

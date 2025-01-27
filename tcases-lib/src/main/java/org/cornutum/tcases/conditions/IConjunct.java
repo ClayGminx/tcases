@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -15,15 +15,14 @@ import java.util.Iterator;
  * more {@link IDisjunct disjunctions}.
  *
  */
-public interface IConjunct extends ICondition
-  {
-  /**
-   * Returns the disjunctions for this conjunction.
-   */
-  public Iterator<IDisjunct> getDisjuncts();
+public interface IConjunct extends ICondition {
+    /**
+     * Returns the disjunctions for this conjunction.
+     */
+    public Iterator<IDisjunct> getDisjuncts();
 
-  /**
-   * Returns the number of disjunctions for this conjunction.
-   */
-  int getDisjunctCount();
-  }
+    /**
+     * Returns the number of disjunctions for this conjunction.
+     */
+    int getDisjunctCount();
+}

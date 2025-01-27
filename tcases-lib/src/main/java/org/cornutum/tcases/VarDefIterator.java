@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -17,103 +17,91 @@ import org.apache.commons.collections4.iterators.SingletonIterator;
  * {@link VarSet variable sets}.
  *
  */
-public class VarDefIterator implements Iterator<VarDef>
-  {
-  /**
-   * Creates a new VarDefIterator object.
-   */
-  public VarDefIterator( FunctionInputDef inputDef)
-    {
-    this( inputDef.getVarDefs());
+public class VarDefIterator implements Iterator<VarDef> {
+    /**
+     * Creates a new VarDefIterator object.
+     */
+    public VarDefIterator(FunctionInputDef inputDef) {
+        this(inputDef.getVarDefs());
     }
 
-  /**
-   * Creates a new VarDefIterator object.
-   */
-  public VarDefIterator( Iterator<IVarDef> varDefs)
-    {
-    varDefs_ = varDefs;
+    /**
+     * Creates a new VarDefIterator object.
+     */
+    public VarDefIterator(Iterator<IVarDef> varDefs) {
+        varDefs_ = varDefs;
     }
 
-  /**
-   * Creates a new VarDefIterator object.
-   */
-  public VarDefIterator( IVarDef varDef)
-    {
-    this( new SingletonIterator<IVarDef>( varDef));
+    /**
+     * Creates a new VarDefIterator object.
+     */
+    public VarDefIterator(IVarDef varDef) {
+        this(new SingletonIterator<IVarDef>(varDef));
     }
 
-  @Override
-  public boolean hasNext()
-    {
-    return getNextVarDef() != null;
+    @Override
+    public boolean hasNext() {
+        return getNextVarDef() != null;
     }
 
-  @Override
-  public VarDef next()
-    {
-    if( !hasNext())
-      {
-      throw new NoSuchElementException();
-      }
-
-    VarDef nextVarDef = getNextVarDef();
-    nextVarDef_ = null;
-
-    return nextVarDef;
-    }
-
-  @Override
-  public void remove()
-    {
-    throw new UnsupportedOperationException();
-    }
-
-  /**
-   * Returns the next
-   */
-  private VarDef getNextVarDef()
-    {
-    if( nextVarDef_ == null)
-      {
-      // Still traversing current VarSet?
-      if( nextVarSet_ != null && nextVarSet_.hasNext())
-        {
-        // Yes, return next VarSet member.
-        nextVarDef_ = nextVarSet_.next();
+    @Override
+    public VarDef next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
         }
-      else
-        {
-        // No, get next variable, skipping any empty VarSet.
-        nextVarSet_ = null;
-        Iterator<IVarDef> members = null;
-        IVarDef varDef;
-        for( varDef = null;
 
-             varDefs_.hasNext()
-               && (members = (varDef = varDefs_.next()).getMembers()) != null
-               && !members.hasNext();
+        VarDef nextVarDef = getNextVarDef();
+        nextVarDef_ = null;
 
-             varDef = null);
-
-        nextVarDef_ =
-          // No VarDef left to visit?
-          varDef == null? null :
-
-          // Next variable is a VarDef?
-          members == null? (VarDef) varDef :
-
-          // No, start traversing next VarSet.
-          (nextVarSet_ = new VarDefIterator( members)).next();
-
-        }
-      }
-
-    return nextVarDef_;
+        return nextVarDef;
     }
 
-  private Iterator<IVarDef> varDefs_;
-  private VarDef nextVarDef_;
-  private VarDefIterator nextVarSet_;
-  }
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Returns the next
+     */
+    private VarDef getNextVarDef() {
+        if (nextVarDef_ == null) {
+            // Still traversing current VarSet?
+            if (nextVarSet_ != null && nextVarSet_.hasNext()) {
+                // Yes, return next VarSet member.
+                nextVarDef_ = nextVarSet_.next();
+            } else {
+                // No, get next variable, skipping any empty VarSet.
+                nextVarSet_ = null;
+                Iterator<IVarDef> members = null;
+                IVarDef varDef;
+                for (varDef = null;
+
+                     varDefs_.hasNext()
+                             && (members = (varDef = varDefs_.next()).getMembers()) != null
+                             && !members.hasNext();
+
+                     varDef = null)
+                    ;
+
+                nextVarDef_ =
+                        // No VarDef left to visit?
+                        varDef == null ? null :
+
+                                // Next variable is a VarDef?
+                                members == null ? (VarDef) varDef :
+
+                                        // No, start traversing next VarSet.
+                                        (nextVarSet_ = new VarDefIterator(members)).next();
+
+            }
+        }
+
+        return nextVarDef_;
+    }
+
+    private Iterator<IVarDef> varDefs_;
+    private VarDef nextVarDef_;
+    private VarDefIterator nextVarSet_;
+}
 

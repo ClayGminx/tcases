@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////////////////////////////
 // 
 //                    Copyright 2012, Cornutum Project
 //                             www.cornutum.org
@@ -16,67 +16,64 @@ import java.util.Iterator;
  * of conditions are satisfied. Defines a logical "and" condition.
  *
  */
-public class AllOf extends ConditionSet
-  {
-  /**
-   * Creates a new AllOf instance.
-   */
-  public AllOf( ICondition ... conditions)
-    {
-    super( conditions);
-    }
-  
-  /**
-   * Returns true if this condition is satisfied by the given test case properties.
-   */
-  @Override
-  public boolean satisfied( PropertySet properties)
-    {
-    boolean isSatisfied;
-    Iterator<ICondition> conditions;
-    
-    for( conditions = getConditions(),
-           isSatisfied = true;
-           
-
-         isSatisfied
-           && conditions.hasNext();
-
-         isSatisfied = conditions.next().satisfied( properties));
-    
-    return isSatisfied;
+public class AllOf extends ConditionSet {
+    /**
+     * Creates a new AllOf instance.
+     */
+    public AllOf(ICondition... conditions) {
+        super(conditions);
     }
 
-  /**
-   * Returns true if this condition is compatible with the given test case properties.
-   * A condition is <em>"compatible"</em> with these properties if it is already satisfied
-   * or if it could be satisfied with the addition of more properties.
-   */
-  @Override
-  public boolean compatible( PropertySet properties)
-    {
-    boolean isCompatible;
-    Iterator<ICondition> conditions;
-    
-    for( conditions = getConditions(),
-           isCompatible = true;
-           
+    /**
+     * Returns true if this condition is satisfied by the given test case properties.
+     */
+    @Override
+    public boolean satisfied(PropertySet properties) {
+        boolean isSatisfied;
+        Iterator<ICondition> conditions;
 
-         isCompatible
-           && conditions.hasNext();
+        for (conditions = getConditions(),
+                     isSatisfied = true;
 
-         isCompatible = conditions.next().compatible( properties));
-    
-    return isCompatible;
+
+             isSatisfied
+                     && conditions.hasNext();
+
+             isSatisfied = conditions.next().satisfied(properties))
+            ;
+
+        return isSatisfied;
     }
-  
-  /**
-   * Implements the Visitor pattern for this condition.
-   */
-  @Override
-  public void accept( IConditionVisitor visitor)
-    {
-    visitor.visit( this);
+
+    /**
+     * Returns true if this condition is compatible with the given test case properties.
+     * A condition is <em>"compatible"</em> with these properties if it is already satisfied
+     * or if it could be satisfied with the addition of more properties.
+     */
+    @Override
+    public boolean compatible(PropertySet properties) {
+        boolean isCompatible;
+        Iterator<ICondition> conditions;
+
+        for (conditions = getConditions(),
+                     isCompatible = true;
+
+
+             isCompatible
+                     && conditions.hasNext();
+
+             isCompatible = conditions.next().compatible(properties))
+            ;
+
+        return isCompatible;
     }
-  }
+
+    /**
+     * Implements the Visitor pattern for this condition.
+     */
+    @Override
+    public void accept(IConditionVisitor visitor) {
+        visitor.visit(this);
+    }
+}
 
