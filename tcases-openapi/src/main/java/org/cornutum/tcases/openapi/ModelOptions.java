@@ -10,6 +10,7 @@ package org.cornutum.tcases.openapi;
 import org.cornutum.tcases.util.Notifier;
 import org.cornutum.tcases.util.ToString;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Optional;
 
@@ -127,6 +128,14 @@ public class ModelOptions {
         return serverSelector_;
     }
 
+    public File getExtensionFile() {
+        return extensionFile_;
+    }
+
+    public void setExtensionFile(File extensionFile_) {
+        this.extensionFile_ = extensionFile_;
+    }
+
     /**
      * Returns a new ModelOptions builder.
      */
@@ -150,6 +159,7 @@ public class ModelOptions {
                         .append("readOnlyEnforced", isReadOnlyEnforced())
                         .append("writeOnlyEnforced", isWriteOnlyEnforced())
                         .append("server", Optional.ofNullable(String.valueOf(getServerUri())).orElse(String.valueOf(getServerSelector())))
+                        .append("extensionFile", getExtensionFile().getAbsolutePath())
                         .toString();
     }
 
@@ -224,4 +234,5 @@ public class ModelOptions {
     private Source source_;
     private URI serverUri_;
     private ServerSelector serverSelector_;
+    private File extensionFile_;
 }

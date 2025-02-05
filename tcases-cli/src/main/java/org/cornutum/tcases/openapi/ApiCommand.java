@@ -39,10 +39,11 @@ import static org.cornutum.tcases.CommandUtils.*;
  * Generates input models and test models for API clients and servers, based on an OpenAPI v3 compliant API definition.
  */
 public class ApiCommand {
+
     /**
-     * Represents a set of command line options.
+     * 代表一组命令行选项。
      *
-     * Command line arguments have the following form.
+     * 命令行参数具有以下形式。
      * <P/>
      * <BLOCKQUOTE>
      * <CODE>
@@ -57,7 +58,7 @@ public class ApiCommand {
      *
      * <TR valign="top">
      * <TD colspan="3">
-     * where each <I>option</I> is one of the following:
+     * 其中每个<I>option</I>是以下之一：
      * </TD>
      * </TR>
      *
@@ -69,10 +70,10 @@ public class ApiCommand {
      * <NOBR>-C | -S | -D</NOBR>
      * </TD>
      * <TD>
-     * If <I>-C</I> is given, produce test models for an API client, i.e. API response tests.
-     * If <I>-S</I> is given, produce test models for an API server, i.e. API request tests.
-     * If <I>-D</I> is given, produce request test cases for an API server, i.e. API request tests.
-     * If none of these is given, the default is <I>-S</I>.
+     * 如果指定了<I>-C</I>, 则为API客户端生成测试模型，即API响应测试。
+     * 如果指定了<I>-S</I>, 则为API服务器生成测试模型，即API请求测试。
+     * 如果指定了<I>-D</I>, 则为API服务器生成请求测试用例，即API请求测试。
+     * 如果未指定这些选项，默认为<I>-S</I>。
      * </TD>
      * </TR>
      *
@@ -84,8 +85,8 @@ public class ApiCommand {
      * <NOBR>-X</NOBR>
      * </TD>
      * <TD>
-     * If specified, test models are generated based on the examples specified in the <I>apiDef</I>.
-     * Otherwise, by default, test models are created by generating random input values.
+     * 如果指定了此选项，则根据<I>apiDef</I>中指定的示例生成测试模型。
+     * 否则，默认情况下使用随机输入值生成测试模型。
      * </TD>
      * </TR>
      *
@@ -97,9 +98,8 @@ public class ApiCommand {
      * <NOBR>-I</NOBR>
      * </TD>
      * <TD>
-     * Produce an {@link SystemInputDef input definition file} for either an API client (<I>-C</I>) or an API server (<I>-S</I>).
-     * If omitted, produce either the corresponding {@link org.cornutum.tcases.SystemTestDef test definition file}
-     * or list of {@link org.cornutum.tcases.openapi.resolver.RequestCase request test cases} (<I>-D</I>).
+     * 为API客户端(<I>-C</I>)或API服务器(<I>-S</I>)生成一个输入定义文件。
+     * 如果省略了此选项，则生成相应的测试定义文件。
      * </TD>
      * </TR>
      *
@@ -111,11 +111,10 @@ public class ApiCommand {
      * <NOBR>-c M[,R] </NOBR>
      * </TD>
      * <TD>
-     * Defines how input modelling and request case resolution conditions are reported. Both <CODE>M</CODE> (for modelling conditions) and <CODE>R</CODE> (for
-     * resolution conditions) must be one of <CODE>log</CODE>, <CODE>fail</CODE>, or <CODE>ignore</CODE>.
-     * If <CODE>log</CODE> is specified, conditions are reported using log messages.
-     * If <CODE>fail</CODE> is specified, any condition will cause an exception. If <CODE>ignore</CODE> is specified, all conditions
-     * are silently ignored. If <CODE>R</CODE> is omitted, the default is <CODE>log</CODE>. If <I>-c</I> is omitted, the default is <CODE>log,log</CODE>.
+     * 定义如何报告输入建模和请求用例解析条件。M（用于建模条件）和R（用于解析条件）必须是<CODE>log</CODE>、<CODE>fail</CODE>或<CODE>ignore</CODE>之一。
+     * 如果指定了<CODE>log</CODE>, 条件将通过日志消息报告。
+     * 如果指定了<CODE>fail</CODE>, 任何条件都将导致异常。如果指定了<CODE>ignore</CODE>, 所有条件都将被静默忽略。
+     * 如果省略了R，默认值为<CODE>log</CODE>。如果省略了<I>-c</I>, 默认值为<CODE>log,log</CODE>。
      * </TD>
      * </TR>
      *
@@ -127,8 +126,8 @@ public class ApiCommand {
      * <NOBR>-f <I>outFile</I> </NOBR>
      * </TD>
      * <TD>
-     * If <I>-f</I> is defined, output is written to the specified <I>outFile</I>, relative to the given <I>outDir</I>.
-     * If omitted, the default <I>outFile</I> is derived from the <I>apiDef</I>.
+     * 如果指定了<I>-f</I>, 输出将写入指定的<I>outFile</I>, 相对于给定的<I>outDir</I>。
+     * 如果省略了此选项，默认的<I>outFile</I>将从<I>apiDef</I>派生。
      * </TD>
      * </TR>
      *
@@ -140,10 +139,9 @@ public class ApiCommand {
      * <NOBR>-o <I>outDir</I> </NOBR>
      * </TD>
      * <TD>
-     * If <I>-o</I> is defined, output is written to the specified directory.
-     * If omitted, the default <I>outDir</I> is the directory containing the <I>apiDef</I> or,
-     * if reading from standard input, the current working directory. If an output path cannot be
-     * derived, output is written to standard output.
+     * 如果指定了<I>-o</I>, 输出将写入指定的目录。
+     * 如果省略了此选项，默认的<I>outDir</I>是包含<I>apiDef</I>的目录，
+     * 或者如果从标准输入读取，则为当前工作目录。如果无法推导输出路径，输出将写入标准输出。
      * </TD>
      * </TR>
      *
@@ -155,8 +153,7 @@ public class ApiCommand {
      * <NOBR>-R </NOBR>
      * </TD>
      * <TD>
-     * If specified, tests will be generated assuming that the API will strictly enforce exclusion of "readOnly"
-     * properties from request parameters. If omitted, no strict enforcement is assumed.
+     * 如果指定了此选项，则假设API将严格排除“readOnly”属性作为请求参数。如果省略了此选项，则不假定严格的强制执行。
      * </TD>
      * </TR>
      *
@@ -168,8 +165,7 @@ public class ApiCommand {
      * <NOBR>-W </NOBR>
      * </TD>
      * <TD>
-     * If specified, tests will be generated assuming that the API will strictly enforce exclusion of "writeOnly"
-     * properties from responses. If omitted, no strict enforcement is assumed.
+     * 如果指定了此选项，则假设API将严格排除“writeOnly”属性作为响应。如果省略了此选项，则不假定严格的强制执行。
      * </TD>
      * </TR>
      *
@@ -181,9 +177,8 @@ public class ApiCommand {
      * <NOBR>-J </NOBR>
      * </TD>
      * <TD>
-     * If <I>-J</I> is defined, test definition output is transformed into Java source code for a JUnit
-     * test class. The resulting Java source file is written to the specified <I>outDir</I>.
-     * Ignored if <I>-I</I> is specified.
+     * 如果指定了<I>-J</I>, 测试定义输出将转换为JUnit测试类的Java源代码。生成的Java源文件将写入指定的<I>outDir</I>。
+     * 如果指定了<I>-I</I>, 此选项将被忽略。
      * </TD>
      * </TR>
      *
@@ -195,8 +190,8 @@ public class ApiCommand {
      * <NOBR>-H </NOBR>
      * </TD>
      * <TD>
-     * If <I>-H</I> is defined, test definition output is transformed into an HTML report. The resulting HTML file is written to the specified <I>outDir</I>.
-     * Ignored if <I>-I</I> is specified.
+     * 如果指定了<I>-H</I>, 测试定义输出将转换为HTML报告。生成的HTML文件将写入指定的<I>outDir</I>。
+     * 如果指定了<I>-I</I>, 此选项将被忽略。
      * </TD>
      * </TR>
      *
@@ -208,9 +203,7 @@ public class ApiCommand {
      * <NOBR>-x <I>transformDef</I> </NOBR>
      * </TD>
      * <TD>
-     * If <I>-x</I> is defined, test definition output is transformed according to the XSLT transform defined
-     * by the <I>transformDef</I> file. If relative, the <I>transformDef</I> path is assumed to be relative to the
-     * directory containing the <I>apiDef</I>.
+     * 如果指定了<I>-x</I>, 测试定义输出将根据由<I>transformDef</I>文件定义的XSLT转换进行转换。如果相对路径，则假定<I>transformDef</I>路径相对于包含<I>apiDef</I>的目录。
      * </TD>
      * </TR>
      *
@@ -222,8 +215,7 @@ public class ApiCommand {
      * <NOBR>-p <I>name</I>=<I>value</I> </NOBR>
      * </TD>
      * <TD>
-     * Defines the value of a transform parameter. Any number of <I>-p</I> options may be specified.
-     * This option is meaningful only if the <I>-x</I> or <I>-J</I> option is given.
+     * 定义转换参数的值。可以指定任意数量的<I>-p</I>选项。仅当指定了<I>-x</I>或<I>-J</I>选项时，此选项才有意义。
      * </TD>
      * </TR>
      *
@@ -235,8 +227,8 @@ public class ApiCommand {
      * <NOBR>-r <I>seed</I> </NOBR>
      * </TD>
      * <TD>
-     * When <I>-D</I> is specified, use the given random number seed to generate request test case input values.
-     * If omitted, the default random number seed is derived from the <I>apiDef</I> name.
+     * 当指定了<I>-D</I>时，使用给定的随机数种子生成请求测试用例输入值。
+     * 如果省略了此选项，默认的随机数种子将从<I>apiDef</I>名称派生。
      * </TD>
      * </TR>
      *
@@ -248,8 +240,8 @@ public class ApiCommand {
      * <NOBR>-m <I>maxTries</I> </NOBR>
      * </TD>
      * <TD>
-     * When <I>-D</I> is specified, defines the maximum attempts made to resolve a request test case input value before reporting failure.
-     * If omitted, the default value is 10000.
+     * 当指定了<I>-D</I>时，定义解析请求测试用例输入值的最大尝试次数，然后报告失败。
+     * 如果省略了此选项，默认值为10000。
      * </TD>
      * </TR>
      *
@@ -261,9 +253,8 @@ public class ApiCommand {
      * <NOBR>-T <I>contentType</I> </NOBR>
      * </TD>
      * <TD>
-     * Defines the content type of the OpenApi definition. The <I>contentType</I> must be one of "json", "yaml", or "yml".
-     * If omitted, the default content type is derived from the <I>apiDef</I> name. If the <I>apiDef</I> is read from standard
-     * input or does not have a recognized extension, the default content type is "json".
+     * 定义OpenApi定义的内容类型。<I>contentType</I>必须是"json"、"yaml"或"yml"之一。
+     * 如果省略了此选项，默认内容类型将从<I>apiDef</I>名称派生。如果<I>apiDef</I>是从标准输入读取的或没有识别的扩展名，默认内容类型为"json"。
      * </TD>
      * </TR>
      *
@@ -275,7 +266,7 @@ public class ApiCommand {
      * <NOBR>-v </NOBR>
      * </TD>
      * <TD>
-     * Prints the current command version identifier to standard output.
+     * 将当前命令版本标识符打印到标准输出。
      * </TD>
      * </TR>
      *
@@ -287,17 +278,14 @@ public class ApiCommand {
      * <NOBR><I>apiDef</I> </NOBR>
      * </TD>
      * <TD>
-     * An OpenAPI v3 API definition is read from the given <I>apiDef</I> file. If omitted, the API definition is
-     * read from standard input. If no <I>outFile</I> is specified, output is written to a default file
-     * derived from the <I>apiDef</I> or, if no <I>apiDef</I> is given, to standard output.
+     * 从给定的<I>apiDef</I>文件读取OpenAPI v3 API定义。如果省略了此选项，则从标准输入读取API定义。如果没有指定<I>outFile</I>, 输出将写入默认文件，
+     * 该文件从<I>apiDef</I>派生，或者如果没有给出<I>apiDef</I>, 则写入标准输出。
      * <P/>
-     * Suppose that the base name of <I>apiDef</I> (less any extension) is <I>B</I>. Then, assuming
-     * defaults for all options, output will be a test definition for API requests written to a file
-     * named "<I>B</I>-Requests-Test.json". If <I>-C</I> is specified, output will be a test
-     * definition for API responses written to a file named "<I>B</I>-Responses-Test.json".
-     * If <I>-D</I> is specified, output will be a list of request test cases written to a file named "<I>B</I>-Request-Cases.json".
-     * If <I>-I</I> is specified, output will be the corresponding input definition, written to either
-     * "<I>B</I>-Requests-Input.json" or "<I>B</I>-Responses-Input.json", respectively.
+     * 假设<I>apiDef</I>的基本名称（去掉任何扩展名）为<I>B</I>。那么，假设所有选项都使用默认值，输出将是API请求的测试定义，
+     * 写入名为"<I>B</I>-Requests-Test.json"的文件。如果指定了<I>-C</I>, 输出将是API响应的测试定义，
+     * 写入名为"<I>B</I>-Responses-Test.json"的文件。如果指定了<I>-D</I>, 输出将是请求测试用例列表，
+     * 写入名为"<I>B</I>-Request-Cases.json"的文件。如果指定了<I>-I</I>, 输出将是相应的输入定义，
+     * 写入名为"<I>B</I>-Requests-Input.json"或"<I>B</I>-Responses-Input.json"的文件。
      * </TD>
      * </TR>
      *
@@ -326,7 +314,8 @@ public class ApiCommand {
 
         /**
          * Creates a new Options object.
-         * <p>创建一个新的命令行选项对象。</p>
+         * <p/>
+         * 创建一个新的命令行选项对象。
          */
         public Options(String[] args) {
             this();
@@ -505,8 +494,9 @@ public class ApiCommand {
          * Prints usage information to standard error.
          */
         protected void printUsage() {
+            // TODO 待汉化
             for (String line :
-                    new String[]{
+                    new String[] {
                             "Usage: tcases-api [option...] [apiDef]",
                             "",
                             "Generates input models and test models for API clients and servers, based on an OpenAPI v3 compliant API definition.",
@@ -735,11 +725,10 @@ public class ApiCommand {
          * Changes the OpenApi definition file content type.
          */
         public void setContentType(String option) {
-            String contentType =
-                    Optional.ofNullable(option)
-                            .map(String::toLowerCase)
-                            .filter(type -> "json".equals(type) || "yml".equals(type) || "yaml".equals(type))
-                            .orElse(null);
+            String contentType = Optional.ofNullable(option)
+                    .map(String::toLowerCase)
+                    .filter(type -> "json".equals(type) || "yml".equals(type) || "yaml".equals(type))
+                    .orElse(null);
 
             if (option != null && contentType == null) {
                 throw new IllegalArgumentException(String.format("'%s' is not a valid content type", option));
@@ -804,10 +793,9 @@ public class ApiCommand {
          * Returns the default random number generator seed for request case resolution.
          */
         public Long getDefaultRandomSeed() {
-            return
-                    Optional.ofNullable(getApiDef())
-                            .map(def -> (long) def.getName().hashCode())
-                            .orElse(new Random().nextLong());
+            return Optional.ofNullable(getApiDef())
+                    .map(def -> (long) def.getName().hashCode())
+                    .orElse(new Random().nextLong());
         }
 
         /**
@@ -842,18 +830,12 @@ public class ApiCommand {
          */
         public void setOnModellingCondition(String notifier) {
             getModelOptions().setConditionNotifier(
-                    Optional.ofNullable(
-                                    notifier == null || "log".equals(notifier) ?
-                                            ModelConditionNotifier.log() :
-
-                                            "fail".equals(notifier) ?
-                                                    ModelConditionNotifier.fail() :
-
-                                                    "ignore".equals(notifier) ?
-                                                            Notifier.ignore() :
-
-                                                            null)
-
+                    Optional.ofNullable(notifier == null || "log".equals(notifier)
+                                    ? ModelConditionNotifier.log()
+                                    : "fail".equals(notifier)
+                                        ? ModelConditionNotifier.fail()
+                                        : "ignore".equals(notifier)
+                                            ? Notifier.ignore() : null)
                             .orElseThrow(() -> getUsageException("Unknown condition notifier: " + notifier, null)));
         }
 
@@ -862,18 +844,12 @@ public class ApiCommand {
          */
         public void setOnResolverCondition(String notifier) {
             getResolverContext().setNotifier(
-                    Optional.ofNullable(
-                                    notifier == null || "log".equals(notifier) ?
-                                            RequestCaseConditionNotifier.log() :
-
-                                            "fail".equals(notifier) ?
-                                                    RequestCaseConditionNotifier.fail() :
-
-                                                    "ignore".equals(notifier) ?
-                                                            Notifier.ignore() :
-
-                                                            null)
-
+                    Optional.ofNullable(notifier == null || "log".equals(notifier)
+                                    ? RequestCaseConditionNotifier.log()
+                                    : "fail".equals(notifier)
+                                        ? RequestCaseConditionNotifier.fail()
+                                        : "ignore".equals(notifier)
+                                            ? Notifier.ignore() : null)
                             .orElseThrow(() -> getUsageException("Unknown condition notifier: " + notifier, null)));
         }
 
@@ -903,6 +879,8 @@ public class ApiCommand {
 
         /**
          * Changes the Open API v3 API definition file
+         * <p/>
+         * 设置基于OpenAPI v3的定义文件
          */
         public void setApiDef(File apiDef) {
             apiDef_ = apiDef;
@@ -910,6 +888,8 @@ public class ApiCommand {
 
         /**
          * Returns the Open API v3 API definition file
+         * <p/>
+         * 获取基于OpenAPI v3的定义文件
          */
         public File getApiDef() {
             return apiDef_;
@@ -917,16 +897,18 @@ public class ApiCommand {
 
         /**
          * Changes the current working directory used to complete relative path names.
+         * <p/>
+         * 设置工作位置
          */
         public void setWorkingDir(File workingDir) {
-            workingDir_ =
-                    workingDir == null
-                            ? new File(".")
-                            : workingDir;
+            // 默认是当前目录
+            workingDir_ = workingDir == null ? new File(".") : workingDir;
         }
 
         /**
          * Returns the current working directory used to complete relative path names.
+         * <p/>
+         * 获取当前工作位置
          */
         public File getWorkingDir() {
             return workingDir_;
@@ -947,13 +929,6 @@ public class ApiCommand {
         }
 
         /**
-         * 返回扩展文件
-         */
-        public File getExtensionFile() {
-            return extensionFile_;
-        }
-
-        /**
          * 设置扩展文件
          * <p/>
          * 一般用户不会为了使用此工具而修改基于OpenAPI规范的输入文件，
@@ -961,7 +936,7 @@ public class ApiCommand {
          * 的输入文件，从而达到生成更完全的用例的目的。
          */
         public void setExtensionFile(File extensionFile) {
-            extensionFile_ = extensionFile;
+            getModelOptions().setExtensionFile(extensionFile);
         }
 
         /**
@@ -1037,6 +1012,10 @@ public class ApiCommand {
                 builder.append(" -T ").append(getContentType());
             }
 
+            if (getModelOptions().getExtensionFile() != null) {
+                builder.append(" -E ").append(getModelOptions().getExtensionFile().getPath());
+            }
+
             if (showVersion()) {
                 builder.append(" -v");
             }
@@ -1059,7 +1038,6 @@ public class ApiCommand {
         private File workingDir_;
         private boolean showVersion_;
         private Long randomSeed_;
-        private File extensionFile_;
 
         public static class Builder {
             public Builder() {
@@ -1169,11 +1147,6 @@ public class ApiCommand {
                 return this;
             }
 
-            public Builder extensionFile(File extensionFile) {
-                options_.setExtensionFile(extensionFile);
-                return this;
-            }
-
             public Options build() {
                 return options_;
             }
@@ -1224,18 +1197,15 @@ public class ApiCommand {
             apiDefFile = new File(options.getWorkingDir(), apiDefFile.getPath());
         }
 
-        File inputDir =
-                apiDefFile == null
-                        ? options.getWorkingDir()
-                        : apiDefFile.getParentFile();
+        File inputDir = apiDefFile == null ? options.getWorkingDir() : apiDefFile.getParentFile();
 
         // Generate requested input definition
         logger_.info("Reading API definition from {}", apiDefFile == null ? "standard input" : apiDefFile);
-        logger_.info("Generating an input model based on API {}", options.getModelOptions().getSource().equals(ModelOptions.Source.EXAMPLES) ? "examples" : "schemas");
-        SystemInputDef inputDef =
-                options.isServerTest()
-                        ? TcasesOpenApiIO.getRequestInputModel(apiDefFile, options.getContentType(), options.getModelOptions())
-                        : TcasesOpenApiIO.getResponseInputModel(apiDefFile, options.getContentType(), options.getModelOptions());
+        logger_.info("Generating an input model based on API {}",
+                options.getModelOptions().getSource().equals(ModelOptions.Source.EXAMPLES) ? "examples" : "schemas");
+        SystemInputDef inputDef = options.isServerTest()
+                ? TcasesOpenApiIO.getRequestInputModel(apiDefFile, options.getContentType(), options.getModelOptions())
+                : TcasesOpenApiIO.getResponseInputModel(apiDefFile, options.getContentType(), options.getModelOptions());
 
         if (inputDef == null) {
             logger_.warn("No {} defined", options.isServerTest() ? "requests" : "responses");
@@ -1246,22 +1216,18 @@ public class ApiCommand {
             if (outputFile == null && apiDefFile != null) {
                 // No, use default name
                 boolean requestTestCases = options.isTests() && options.isRequestCases();
-                outputFile =
-                        new File(
-                                String.format(
-                                        "%s%s-%s-%s.json",
-                                        Optional.ofNullable(apiDefFile.getParent()).map(p -> p + "/").orElse(""),
-                                        getBaseName(apiDefFile.getName()),
-                                        requestTestCases ? "Request" : options.isServerTest() ? "Requests" : "Responses",
-                                        requestTestCases ? "Cases" : options.isTests() ? "Test" : "Input"));
+                outputFile = new File(
+                        String.format(
+                                "%s%s-%s-%s.json",
+                                Optional.ofNullable(apiDefFile.getParent()).map(p -> p + "/").orElse(""),
+                                getBaseName(apiDefFile.getName()),
+                                requestTestCases ? "Request" : options.isServerTest() ? "Requests" : "Responses",
+                                requestTestCases ? "Cases" : options.isTests() ? "Test" : "Input"));
             }
             if (outputFile != null) {
                 // Ensure output directory exists.
                 if (outputDir == null) {
-                    outputDir =
-                            outputFile.isAbsolute()
-                                    ? outputFile.getParentFile()
-                                    : inputDir;
+                    outputDir = outputFile.isAbsolute() ? outputFile.getParentFile() : inputDir;
                 }
                 if (!outputDir.exists() && !outputDir.mkdirs()) {
                     throw new RuntimeException("Can't create output directory=" + outputDir);
@@ -1276,16 +1242,16 @@ public class ApiCommand {
                 transformer = null;
             } else if (options.getTransformType() == Options.TransformType.JUNIT) {
                 transformer = new TestDefToJUnitFilter(MapBuilder.of("system", (Object) inputDef.getName()).build());
-                outputFile =
-                        Optional.ofNullable(outputFile)
-                                .map(f -> new File(f.getParentFile(), getBaseName(f.getName()).replaceAll("\\W+", "") + ".java"))
-                                .orElse(null);
+                outputFile = Optional.ofNullable(outputFile)
+                        .map(f -> new File(
+                                f.getParentFile(),
+                                getBaseName(f.getName()).replaceAll("\\W+", "") + ".java"))
+                        .orElse(null);
             } else if (options.getTransformType() == Options.TransformType.HTML) {
                 transformer = new TestDefToHtmlFilter();
-                outputFile =
-                        Optional.ofNullable(outputFile)
-                                .map(f -> new File(f.getParentFile(), getBaseName(f.getName()) + ".htm"))
-                                .orElse(null);
+                outputFile = Optional.ofNullable(outputFile)
+                        .map(f -> new File(f.getParentFile(), getBaseName(f.getName()) + ".htm"))
+                        .orElse(null);
             } else {
                 transformer =
                         Optional.ofNullable(options.getTransformDef())
@@ -1325,7 +1291,10 @@ public class ApiCommand {
                     options.setRandomSeed(options.getDefaultRandomSeed());
                 }
                 logger_.info("Generating request test cases using random seed={}", options.getRandomSeed());
-                TcasesOpenApiIO.writeRequestCases(Tcases.getTests(inputDef, null, null), options.getResolverContext(), outputStream);
+                TcasesOpenApiIO.writeRequestCases(
+                        Tcases.getTests(inputDef, null, null),
+                        options.getResolverContext(),
+                        outputStream);
             } else {
                 TcasesOpenApiIO.writeTests(Tcases.getTests(inputDef, null, null), outputStream);
             }
