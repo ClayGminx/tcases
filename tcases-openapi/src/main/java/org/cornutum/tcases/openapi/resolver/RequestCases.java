@@ -49,7 +49,7 @@ public final class RequestCases {
                                 .collect(toList()));
 
         getSerializedDups(realizable)
-                .forEach(rc -> realizable.remove(rc));
+                .forEach(realizable::remove);
 
         return realizable;
     }
@@ -63,7 +63,7 @@ public final class RequestCases {
         return
                 new RequestTestDef(
                         getRequestCaseDefs(testDef).stream()
-                                .map(requestCaseDef -> resolver.resolve(requestCaseDef))
+                                .map(resolver::resolve)
                                 .filter(Objects::nonNull)
                                 .collect(toList()));
     }

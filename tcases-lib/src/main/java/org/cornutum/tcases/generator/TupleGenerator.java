@@ -7,34 +7,22 @@
 
 package org.cornutum.tcases.generator;
 
-import org.cornutum.tcases.*;
-import org.cornutum.tcases.util.CartesianProduct;
-import org.cornutum.tcases.util.ToString;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.MultiValuedMap;
-
-import static org.apache.commons.collections4.functors.NOPTransformer.nopTransformer;
-
+import org.cornutum.tcases.*;
+import org.cornutum.tcases.openapi.db.SqliteQuery;
+import org.cornutum.tcases.openapi.mapping.FieldMapping;
+import org.cornutum.tcases.util.CartesianProduct;
+import org.cornutum.tcases.util.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.collections4.functors.NOPTransformer.nopTransformer;
 
 /**
  * Generates {@link TestCase test cases} for a {@link FunctionInputDef function} that use
@@ -284,7 +272,7 @@ public class TupleGenerator implements ITestCaseGenerator {
     private List<TestCaseDef> getValidCases(FunctionInputDef inputDef, VarTupleSet validTuples) {
         logger_.debug("{}: Creating valid test cases", inputDef);
 
-        List<TestCaseDef> validCases = new ArrayList<TestCaseDef>();
+        List<TestCaseDef> validCases = new ArrayList<>();
 
         // For each valid input tuple not yet used in a test case...
         Tuple nextUnused;
@@ -301,8 +289,100 @@ public class TupleGenerator implements ITestCaseGenerator {
             }
         }
 
+        addMoreValidCases(validCases, inputDef, validTuples);
+
         logger_.info("{}: Created {} valid test cases", inputDef, validCases.size());
         return validCases;
+    }
+
+    /**
+     * 添加更多有效的用例
+     * @param validCases 合法的用例
+     * @param inputDef 函数输入定义
+     * @param validTuples 合法的变量元组集
+     */
+    private void addMoreValidCases(List<TestCaseDef> validCases, FunctionInputDef inputDef, VarTupleSet validTuples) {
+        IVarDef body = inputDef.getVarDef("Body");
+        if (body != null && "request".equals(body.getType())) {
+            // 需要增加用例，只为必填字段赋值
+            TestCaseDef onlyDefinedTestCase = new TestCaseDef();
+            onlyDefinedTestCase.setName("Body.OnlyDefined='Yes'");
+
+            int definedCount = 0;
+            for (Iterator<Tuple> tupleIter = validTuples.getUsed(); tupleIter.hasNext(); ) {
+                Tuple tuple = tupleIter.next();
+                for (Iterator<VarBindingDef> bindingsIter = tuple.getBindings(); bindingsIter.hasNext(); ) {
+                    VarBindingDef varBindingDef = bindingsIter.next();
+                    VarDef varDef = varBindingDef.getVarDef();
+                    String pathName = varDef.getPathName();
+                    if ("Body.Defined".equals(pathName)
+                            || "Body.Media-Type".equals(pathName)
+                            || "Body.application-json.Type".equals(pathName)) {
+                        onlyDefinedTestCase.addCompatible(tuple);
+                    } else {
+                        // 找到形如Body.application-json.Value.Properties.id的节点
+                        String propsNode = "Body.application-json.Value.Properties";
+                        VarSet node = varDef.getParent();
+                        while (node != null && node.getParent() != null
+                                && node.getPathName().startsWith(propsNode)
+                                && !propsNode.equals(node.getParent().getPathName())) {
+                            node = node.getParent();
+                        }
+                        // 判断是否必填字段
+                        if (node != null && propsNode.equals(node.getParent().getPathName())) {
+                            IVarDef definedMember = node.getMember("Defined");
+                            for (Iterator<VarValueDef> valueIter = definedMember.getValues(); valueIter.hasNext(); ) {
+                                VarValueDef valueDef = valueIter.next();
+                                if ("No".equals(valueDef.getName()) && !valueDef.getType().isValid()) {
+                                    onlyDefinedTestCase.addCompatible(tuple);
+                                    definedCount++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (definedCount > 0) {
+                logger_.info("{}: Adding a valid test cases with only defined fields", inputDef);
+                validCases.add(onlyDefinedTestCase);
+            }
+        }
+
+        FieldMapping useCaseExtensions = inputDef.getUseCaseExtensions();
+        if (useCaseExtensions != null) {
+            logger_.info("{}: Adding more valid test cases", inputDef);
+
+            String tableName = useCaseExtensions.getTableName();
+            String fieldName = useCaseExtensions.getTableFieldName();
+            Object fieldValue = SqliteQuery.getRandomValue(tableName, fieldName);
+
+            TestCaseDef testCaseDef = new TestCaseDef();
+            testCaseDef.setName("petId.TrueValue.Is='" + fieldValue + "'");
+            boolean added = false;
+            for (Iterator<Tuple> tupleIter = validTuples.getUsed(); tupleIter.hasNext(); ) {
+                Tuple tuple = tupleIter.next();
+                for (Iterator<VarBindingDef> bindingsIter = tuple.getBindings(); bindingsIter.hasNext(); ) {
+                    VarBindingDef varBindingDef = bindingsIter.next();
+                    VarDef varDef = varBindingDef.getVarDef();
+                    if ("path".equals(varDef.getType()) && "Is".equals(varDef.getName())) {
+                        if (!added) {
+                            Tuple newTuple = new Tuple();
+                            VarValueDef newValueDef = new VarValueDef(fieldValue);
+                            varDef.addValue(newValueDef);
+                            newTuple.add(new VarBindingDef(varDef, newValueDef));
+                            testCaseDef.addCompatible(newTuple);
+                            added = true;
+                        }
+                    } else {
+                        testCaseDef.addCompatible(tuple);
+                    }
+                }
+            }
+            if (added) {
+                validCases.add(testCaseDef);
+            }
+        }
     }
 
     /**
@@ -628,7 +708,7 @@ public class TupleGenerator implements ITestCaseGenerator {
     private List<TestCaseDef> getFailureCases(FunctionInputDef inputDef, VarTupleSet failureTuples, VarTupleSet validTuples) {
         logger_.debug("{}: Creating failure test cases", inputDef);
 
-        List<TestCaseDef> failureCases = new ArrayList<TestCaseDef>();
+        List<TestCaseDef> failureCases = new ArrayList<>();
 
         // For each failure input tuple not yet used in a test case...
         Tuple nextUnused;
@@ -641,6 +721,8 @@ public class TupleGenerator implements ITestCaseGenerator {
                 failureCases.add(failureCase);
             }
         }
+
+        // TODO 增加反用例
 
         logger_.info("{}: Created {} failure test cases", inputDef, failureCases.size());
         return failureCases;

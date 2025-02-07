@@ -7,6 +7,7 @@
 
 package org.cornutum.tcases;
 
+import org.cornutum.tcases.openapi.mapping.FieldMapping;
 import org.cornutum.tcases.util.ToString;
 
 import static org.cornutum.tcases.DefUtils.*;
@@ -22,7 +23,8 @@ import java.util.TreeSet;
 
 /**
  * Defines the input space for a specific function.
- *
+ * <p/>
+ * 为指定的函数定义输入空间。
  */
 public class FunctionInputDef extends Annotated {
     /**
@@ -127,14 +129,11 @@ public class FunctionInputDef extends Annotated {
         String[] path = DefUtils.toPath(pathName);
         IVarDef var;
 
-        return
-                path == null ?
-                        null :
-
-                        (var = getVarDef(StringUtils.trimToNull(path[0]))) == null ?
-                                null :
-
-                                var.find(Arrays.copyOfRange(path, 1, path.length));
+        return path == null
+                ?  null
+                : (var = getVarDef(StringUtils.trimToNull(path[0]))) == null
+                    ? null
+                    : var.find(Arrays.copyOfRange(path, 1, path.length));
     }
 
     /**
@@ -142,17 +141,20 @@ public class FunctionInputDef extends Annotated {
      */
     public VarDef findVarDefPath(String pathName) {
         IVarDef var = findVarPath(pathName);
-        return
-                var != null && var.getClass().equals(VarDef.class)
-                        ? (VarDef) var
-                        : null;
+        return var != null && var.getClass().equals(VarDef.class) ? (VarDef) var : null;
+    }
+
+    public FieldMapping getUseCaseExtensions() {
+        return useCaseExtensions_;
+    }
+
+    public void setUseCaseExtensions(FieldMapping useCaseExtensions_) {
+        this.useCaseExtensions_ = useCaseExtensions_;
     }
 
     @Override
     public int hashCode() {
-        return
-                getClass().hashCode()
-                        ^ Objects.hashCode(getName());
+        return getClass().hashCode() ^ Objects.hashCode(getName());
     }
 
     @Override
@@ -162,20 +164,16 @@ public class FunctionInputDef extends Annotated {
                         ? (FunctionInputDef) object
                         : null;
 
-        return
-                other != null
-                        && Objects.equals(getName(), other.getName());
+        return other != null && Objects.equals(getName(), other.getName());
     }
 
     @Override
     public String toString() {
-        return
-                ToString.getBuilder(this)
-                        .append(getName())
-                        .toString();
+        return ToString.getBuilder(this).append(getName()).toString();
     }
 
     private String name_;
-    private List<IVarDef> vars_ = new ArrayList<IVarDef>();
+    private List<IVarDef> vars_ = new ArrayList<>();
+    private FieldMapping useCaseExtensions_;
 }
 

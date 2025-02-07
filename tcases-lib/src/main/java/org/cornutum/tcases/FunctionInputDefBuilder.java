@@ -8,9 +8,12 @@
 
 package org.cornutum.tcases;
 
+import org.cornutum.tcases.openapi.mapping.FieldMapping;
+
 import static org.cornutum.tcases.util.CollectionUtils.toStream;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -65,19 +68,17 @@ public class FunctionInputDefBuilder extends AnnotatedBuilder<FunctionInputDefBu
      * Starts building a new function input definition.
      */
     public FunctionInputDefBuilder start(FunctionInputDef functionInputDef) {
-        functionInputDef_ =
-                Optional.ofNullable(functionInputDef)
-                        .map(f ->
-                                FunctionInputDefBuilder.with(f.getName())
-                                        .vars(
-                                                toStream(f.getVarDefs())
-                                                        .map(v ->
-                                                                v.getMembers() == null
-                                                                        ? (IVarDef) VarDefBuilder.with((VarDef) v).build()
-                                                                        : (IVarDef) VarSetBuilder.with((VarSet) v).build()))
-                                        .annotations(f)
-                                        .build())
-                        .orElse(new FunctionInputDef("F"));
+        functionInputDef_ = Optional.ofNullable(functionInputDef).map(f ->
+                        FunctionInputDefBuilder
+                                .with(f.getName())
+                                .vars(toStream(f.getVarDefs()).map(v ->
+                                        v.getMembers() == null
+                                                ? VarDefBuilder.with((VarDef) v).build()
+                                                : VarSetBuilder.with((VarSet) v).build()))
+                                .useCaseExtensions(functionInputDef.getUseCaseExtensions())
+                                .annotations(f)
+                                .build())
+                .orElse(new FunctionInputDef("F"));
 
         return this;
     }
@@ -133,6 +134,20 @@ public class FunctionInputDefBuilder extends AnnotatedBuilder<FunctionInputDefBu
             var.setType(type);
             functionInputDef_.addVarDef(var);
         }
+        return this;
+    }
+
+    public FunctionInputDefBuilder extensions(Map<String, Object> extensions) {
+        if (extensions != null && extensions.containsKey("x-business-cases")) {
+            Map<?, ?> ext = (Map<?, ?>) extensions.get("x-business-cases");
+            FieldMapping fieldMapping = new FieldMapping((String) ext.get("table"), (String) ext.get("model"));
+            functionInputDef_.setUseCaseExtensions(fieldMapping);
+        }
+        return this;
+    }
+
+    public FunctionInputDefBuilder useCaseExtensions(FieldMapping useCaseExtensions) {
+        functionInputDef_.setUseCaseExtensions(useCaseExtensions);
         return this;
     }
 

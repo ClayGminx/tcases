@@ -24,6 +24,10 @@
             <organization>The Cornutum Project</organization>
             <organizationUrl>http://www.cornutum.org</organizationUrl>
         </developer>
+        <developer>
+            <name>Joseph Mark</name>
+            <email>claygminx@gmail.com</email>
+        </developer>
     </developers>
 
     <licenses>

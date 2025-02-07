@@ -62,8 +62,6 @@ import static org.cornutum.tcases.util.CollectionUtils.*;
 public abstract class InputModeller extends ContextHandler<OpenApiContext> {
     protected enum View {REQUEST, RESPONSE}
 
-    ;
-
     /**
      * Creates a new InputModeller instance.
      */
@@ -89,10 +87,9 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * OpenAPI definition. Returns null if the given definition defines no API requests to model.
      */
     protected SystemInputDef requestInputModel(OpenAPI api) {
-        return
-                getOptions().getSource() == ModelOptions.Source.EXAMPLES
-                        ? requestExamplesModel(api)
-                        : requestSchemasModel(api);
+        return getOptions().getSource() == ModelOptions.Source.EXAMPLES
+                ? requestExamplesModel(api)
+                : requestSchemasModel(api);
     }
 
     /**
@@ -109,22 +106,17 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
             throw new OpenApiException("Invalid API definition", e);
         }
 
-        return
-                resultFor(title,
-                        () -> {
-                            SystemInputDef inputDef =
-                                    SystemInputDefBuilder.with(toIdentifier(title))
-                                            .has("title", title)
-                                            .has("version", info.getVersion())
-                                            .hasIf("server", serverUriUsed(api.getServers()))
-                                            .functions(entriesOf(api.getPaths()).flatMap(path -> pathRequestDefs(api, path.getKey(), path.getValue())))
-                                            .build();
+        return resultFor(title, () -> {
+            SystemInputDef inputDef = SystemInputDefBuilder.with(toIdentifier(title))
+                    .has("title", title)
+                    .has("version", info.getVersion())
+                    .hasIf("server", serverUriUsed(api.getServers()))
+                    .functions(entriesOf(api.getPaths())
+                            .flatMap(path -> pathRequestDefs(api, path.getKey(), path.getValue())))
+                    .build();
 
-                            return
-                                    inputDef.getFunctionInputDefs().hasNext()
-                                            ? inputDef
-                                            : null;
-                        });
+            return inputDef.getFunctionInputDefs().hasNext() ? inputDef : null;
+        });
     }
 
     /**
@@ -141,84 +133,70 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
             throw new OpenApiException("Invalid API definition", e);
         }
 
-        return
-                resultFor(title,
-                        () -> {
-                            SystemInputDef inputDef =
-                                    SystemInputDefBuilder.with(toIdentifier(title))
-                                            .has("title", title)
-                                            .has("version", info.getVersion())
-                                            .hasIf("server", serverUriUsed(api.getServers()))
-                                            .functions(entriesOf(api.getPaths()).flatMap(path -> pathRequestExamples(api, path.getKey(), path.getValue())))
-                                            .build();
+        return resultFor(title, () -> {
+            SystemInputDef inputDef = SystemInputDefBuilder.with(toIdentifier(title))
+                    .has("title", title)
+                    .has("version", info.getVersion())
+                    .hasIf("server", serverUriUsed(api.getServers()))
+                    .functions(entriesOf(api.getPaths())
+                            .flatMap(path -> pathRequestExamples(api, path.getKey(), path.getValue())))
+                    .build();
 
-                            return
-                                    inputDef.getFunctionInputDefs().hasNext()
-                                            ? inputDef
-                                            : null;
-                        });
+            return inputDef.getFunctionInputDefs().hasNext() ? inputDef : null;
+        });
     }
 
     /**
      * Returns a request {@link FunctionInputDef function input definition} for each of the API operations for the given path.
      */
     private Stream<FunctionInputDef> pathRequestDefs(OpenAPI api, String path, PathItem pathItem) {
-        return
-                resultFor(path,
-
-                        () ->
-                                Stream.of(
-                                                opRequestDef(api, path, pathItem, "GET", pathItem.getGet()),
-                                                opRequestDef(api, path, pathItem, "PUT", pathItem.getPut()),
-                                                opRequestDef(api, path, pathItem, "POST", pathItem.getPost()),
-                                                opRequestDef(api, path, pathItem, "DELETE", pathItem.getDelete()),
-                                                opRequestDef(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
-                                                opRequestDef(api, path, pathItem, "HEAD", pathItem.getHead()),
-                                                opRequestDef(api, path, pathItem, "PATCH", pathItem.getPatch()),
-                                                opRequestDef(api, path, pathItem, "TRACE", pathItem.getTrace()))
-
-                                        // Skip if operation not defined
-                                        .filter(Objects::nonNull));
+        return resultFor(
+                path,
+                () -> Stream.of(opRequestDef(api, path, pathItem, "GET", pathItem.getGet()),
+                                opRequestDef(api, path, pathItem, "PUT", pathItem.getPut()),
+                                opRequestDef(api, path, pathItem, "POST", pathItem.getPost()),
+                                opRequestDef(api, path, pathItem, "DELETE", pathItem.getDelete()),
+                                opRequestDef(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
+                                opRequestDef(api, path, pathItem, "HEAD", pathItem.getHead()),
+                                opRequestDef(api, path, pathItem, "PATCH", pathItem.getPatch()),
+                                opRequestDef(api, path, pathItem, "TRACE", pathItem.getTrace()))
+                        // Skip if operation not defined
+                        .filter(Objects::nonNull));
     }
 
     /**
      * Returns a request {@link FunctionInputDef function input definition} for the examples of each of the API operations for the given path.
      */
     private Stream<FunctionInputDef> pathRequestExamples(OpenAPI api, String path, PathItem pathItem) {
-        return
-                resultFor(path,
+        return resultFor(
+                path,
+                () -> Stream.of(opRequestExamples(api, path, pathItem, "GET", pathItem.getGet()),
+                                opRequestExamples(api, path, pathItem, "PUT", pathItem.getPut()),
+                                opRequestExamples(api, path, pathItem, "POST", pathItem.getPost()),
+                                opRequestExamples(api, path, pathItem, "DELETE", pathItem.getDelete()),
+                                opRequestExamples(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
+                                opRequestExamples(api, path, pathItem, "HEAD", pathItem.getHead()),
+                                opRequestExamples(api, path, pathItem, "PATCH", pathItem.getPatch()),
+                                opRequestExamples(api, path, pathItem, "TRACE", pathItem.getTrace()))
 
-                        () ->
-                                Stream.of(
-                                                opRequestExamples(api, path, pathItem, "GET", pathItem.getGet()),
-                                                opRequestExamples(api, path, pathItem, "PUT", pathItem.getPut()),
-                                                opRequestExamples(api, path, pathItem, "POST", pathItem.getPost()),
-                                                opRequestExamples(api, path, pathItem, "DELETE", pathItem.getDelete()),
-                                                opRequestExamples(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
-                                                opRequestExamples(api, path, pathItem, "HEAD", pathItem.getHead()),
-                                                opRequestExamples(api, path, pathItem, "PATCH", pathItem.getPatch()),
-                                                opRequestExamples(api, path, pathItem, "TRACE", pathItem.getTrace()))
-
-                                        // Skip if operation not defined
-                                        .filter(Objects::nonNull));
+                        // Skip if operation not defined
+                        .filter(Objects::nonNull));
     }
 
     /**
      * Returns the request {@link FunctionInputDef function input definition} for the given API operation.
      */
     private FunctionInputDef opRequestDef(OpenAPI api, String path, PathItem pathItem, String opName, Operation op) {
-        return
-                resultFor(opName,
-                        () ->
-                                op == null ?
-                                        null :
-
-                                        FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
+        return resultFor(opName, () ->
+                op == null
+                        ? null
+                        : FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
                                                 .hasIf("server", serverUriUsed(pathItem.getServers()))
                                                 .hasIf("server", serverUriUsed(op.getServers()))
                                                 .has("path", path)
                                                 .has("operation", opName)
                                                 .vars(opRequestVars(api, pathItem, op))
+                                                .extensions(pathItem.getExtensions())
                                                 .build());
     }
 
@@ -226,68 +204,70 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * Returns the {@link IVarDef input variable definitions} for the operation request.
      */
     private Stream<IVarDef> opRequestVars(OpenAPI api, PathItem pathItem, Operation op) {
-        return
-                hasInputs(api, pathItem, op) ?
-
-                        Stream.concat(
-                                opParameters(pathItem, op).map(p -> parameterVarDef(api, resolveParameter(api, p))),
+        return hasInputs(api, pathItem, op)
+                ? Stream.concat(
+                                opParameters(pathItem, op)
+                                        .map(p -> parameterVarDef(api, resolveParameter(api, p)))
+                                ,
                                 Stream.concat(
-                                        requestBodyVarDef(api, op.getRequestBody()).map(Stream::of).orElse(Stream.empty()),
-                                        authVarDef(api, op.getSecurity()).map(Stream::of).orElse(Stream.empty()))) :
-
-                        Stream.of(noInputs());
+                                        requestBodyVarDef(api, op.getRequestBody())
+                                                .map(Stream::of)
+                                                .orElse(Stream.empty())
+                                        ,
+                                        authVarDef(api, op.getSecurity())
+                                                .map(Stream::of)
+                                                .orElse(Stream.empty())))
+                : Stream.of(noInputs());
     }
 
     /**
      * Returns the request {@link FunctionInputDef function input definition} for the examples of the given API operation.
      */
     private FunctionInputDef opRequestExamples(OpenAPI api, String path, PathItem pathItem, String opName, Operation op) {
-        return
-                resultFor(opName, () -> {
-                    return
-                            op == null ?
-                                    null :
-
-                                    withoutFailures(
-                                            FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
-                                                    .hasIf("server", serverUriUsed(pathItem.getServers()))
-                                                    .hasIf("server", serverUriUsed(op.getServers()))
-                                                    .has("path", path)
-                                                    .has("operation", opName)
-                                                    .vars(opExampleVars(api, pathItem, op))
-                                                    .build());
-                });
+        return resultFor(opName, () -> op == null ?
+                null :
+                withoutFailures(
+                        FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
+                                .hasIf("server", serverUriUsed(pathItem.getServers()))
+                                .hasIf("server", serverUriUsed(op.getServers()))
+                                .has("path", path)
+                                .has("operation", opName)
+                                .vars(opExampleVars(api, pathItem, op))
+                                .build()));
     }
 
     /**
      * Returns the {@link IVarDef input variable definitions} for the examples of the given operation request.
      */
     private Stream<IVarDef> opExampleVars(OpenAPI api, PathItem pathItem, Operation op) {
-        return
-                hasInputs(api, pathItem, op) ?
-
+        return hasInputs(api, pathItem, op)
+                ? Stream.concat(
+                        opParameters(pathItem, op).map(p -> parameterExamples(api, resolveParameter(api, p)))
+                        ,
                         Stream.concat(
-                                opParameters(pathItem, op).map(p -> parameterExamples(api, resolveParameter(api, p))),
-                                Stream.concat(
-                                        requestBodyExamples(api, op.getRequestBody()).map(Stream::of).orElse(Stream.empty()),
-                                        authVarDef(api, op.getSecurity()).map(Stream::of).orElse(Stream.empty()))) :
-
-                        Stream.of(noInputs());
+                                requestBodyExamples(api, op.getRequestBody())
+                                    .map(Stream::of)
+                                    .orElse(Stream.empty())
+                                ,
+                                authVarDef(api, op.getSecurity())
+                                        .map(Stream::of)
+                                        .orElse(Stream.empty())))
+                : Stream.of(noInputs());
     }
 
     /**
      * Returns true if at least one input is defined for the given request.
      */
     private boolean hasInputs(OpenAPI api, PathItem pathItem, Operation op) {
-        return
-                opParameters(pathItem, op).findAny().isPresent()
-                        ||
-                        op.getRequestBody() != null
-                        ||
-                        Optional.ofNullable(op.getSecurity())
-                                .map(secReqs -> !secReqs.isEmpty())
-                                .orElse(Optional.ofNullable(api.getSecurity()).filter(secReqs -> !secReqs.isEmpty()).isPresent())
-                ;
+        return opParameters(pathItem, op).findAny().isPresent()
+                ||
+                op.getRequestBody() != null
+                ||
+                Optional.ofNullable(op.getSecurity())
+                        .map(secReqs -> !secReqs.isEmpty())
+                        .orElse(Optional.ofNullable(api.getSecurity())
+                                .filter(secReqs -> !secReqs.isEmpty())
+                                .isPresent());
     }
 
     /**
@@ -295,20 +275,22 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      */
     private IVarDef noInputs() {
         String none = "None";
-        return
-                VarSetBuilder.with(none)
-                        .type("implicit")
-                        .members(instanceDefinedVar(none, Definition.NEVER))
-                        .build();
+        return VarSetBuilder.with(none)
+                .type("implicit")
+                .members(instanceDefinedVar(none, Definition.NEVER))
+                .build();
     }
 
     /**
      * Returns the consolidated set of parameters for the given API operation.
      */
     private Stream<Parameter> opParameters(PathItem pathItem, Operation op) {
-        return
-                Stream.concat(membersOf(pathItem.getParameters()), membersOf(op.getParameters()))
-                        .collect(toMap(Parameter::getName, Function.identity(), (pathParam, opParam) -> opParam, () -> new LinkedHashMap<String, Parameter>()))
+        return Stream.concat(membersOf(pathItem.getParameters()), membersOf(op.getParameters()))
+                        .collect(toMap(
+                                Parameter::getName,
+                                Function.identity(),
+                                (pathParam, opParam) -> opParam,
+                                LinkedHashMap::new))
                         .values()
                         .stream();
     }
@@ -327,44 +309,36 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
             throw new OpenApiException("Invalid API definition", e);
         }
 
-        return
-                resultFor(title,
-                        () -> {
-                            SystemInputDef inputDef =
-                                    SystemInputDefBuilder.with(toIdentifier(title))
-                                            .has("title", title)
-                                            .has("version", info.getVersion())
-                                            .hasIf("server", serverUriUsed(api.getServers()))
-                                            .functions(entriesOf(api.getPaths()).flatMap(path -> pathResponseDefs(api, path.getKey(), path.getValue())))
-                                            .build();
+        return resultFor(title, () -> {
+            SystemInputDef inputDef = SystemInputDefBuilder.with(toIdentifier(title))
+                    .has("title", title)
+                    .has("version", info.getVersion())
+                    .hasIf("server", serverUriUsed(api.getServers()))
+                    .functions(entriesOf(api.getPaths())
+                            .flatMap(path -> pathResponseDefs(api, path.getKey(), path.getValue())))
+                    .build();
 
-                            return
-                                    inputDef.getFunctionInputDefs().hasNext()
-                                            ? inputDef
-                                            : null;
-                        });
+            return inputDef.getFunctionInputDefs().hasNext() ? inputDef : null;
+        });
     }
 
     /**
      * Returns a response {@link FunctionInputDef function input definition} for each of the API operations for the given path.
      */
     private Stream<FunctionInputDef> pathResponseDefs(OpenAPI api, String path, PathItem pathItem) {
-        return
-                resultFor(path,
+        return resultFor(
+                path,
+                () -> Stream.of(opResponseDef(api, path, pathItem, "GET", pathItem.getGet()),
+                                opResponseDef(api, path, pathItem, "PUT", pathItem.getPut()),
+                                opResponseDef(api, path, pathItem, "POST", pathItem.getPost()),
+                                opResponseDef(api, path, pathItem, "DELETE", pathItem.getDelete()),
+                                opResponseDef(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
+                                opResponseDef(api, path, pathItem, "HEAD", pathItem.getHead()),
+                                opResponseDef(api, path, pathItem, "PATCH", pathItem.getPatch()),
+                                opResponseDef(api, path, pathItem, "TRACE", pathItem.getTrace()))
 
-                        () ->
-                                Stream.of(
-                                                opResponseDef(api, path, pathItem, "GET", pathItem.getGet()),
-                                                opResponseDef(api, path, pathItem, "PUT", pathItem.getPut()),
-                                                opResponseDef(api, path, pathItem, "POST", pathItem.getPost()),
-                                                opResponseDef(api, path, pathItem, "DELETE", pathItem.getDelete()),
-                                                opResponseDef(api, path, pathItem, "OPTIONS", pathItem.getOptions()),
-                                                opResponseDef(api, path, pathItem, "HEAD", pathItem.getHead()),
-                                                opResponseDef(api, path, pathItem, "PATCH", pathItem.getPatch()),
-                                                opResponseDef(api, path, pathItem, "TRACE", pathItem.getTrace()))
-
-                                        // Skip if operation not defined
-                                        .filter(Objects::nonNull));
+                        // Skip if operation not defined
+                        .filter(Objects::nonNull));
     }
 
     /**
@@ -372,13 +346,10 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      */
     private FunctionInputDef withoutFailures(FunctionInputDef functionDef) {
         toStream(new VarDefIterator(functionDef))
-                .forEach(varDef -> {
-                    toStream(varDef.getFailureValues())
-                            .map(VarValueDef::getName)
-                            .collect(toList())
-                            .stream()
-                            .forEach(value -> varDef.removeValue(value));
-                });
+                .forEach(varDef -> toStream(varDef.getFailureValues())
+                        .map(VarValueDef::getName)
+                        .collect(toList())
+                        .forEach(varDef::removeValue));
 
         return functionDef;
     }
@@ -387,13 +358,11 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * Returns the response {@link FunctionInputDef function input definition} for the given API operation.
      */
     private FunctionInputDef opResponseDef(OpenAPI api, String path, PathItem pathItem, String opName, Operation op) {
-        return
-                resultFor(opName,
-                        () ->
-                                op == null ?
-                                        null :
-
-                                        FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
+        return resultFor(
+                opName,
+                () -> op == null ?
+                        null :
+                        FunctionInputDefBuilder.with(String.format("%s_%s", opName, functionPathName(path)))
                                                 .hasIf("server", serverUriUsed(pathItem.getServers()))
                                                 .hasIf("server", serverUriUsed(op.getServers()))
                                                 .vars(responsesVars(api, expectedValueOf(op.getResponses(), "responses")))
@@ -404,32 +373,30 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * Returns the {@link IVarDef input variable definition} for the given request body.
      */
     private Optional<IVarDef> requestBodyVarDef(OpenAPI api, RequestBody body) {
-        return
-                resultFor("requestBody",
-                        () ->
-                                Optional.ofNullable(body)
-                                        .map(b -> resolveRequestBody(api, b))
-                                        .map(b -> {
-                                            String contentVarTag = contentVarTag("body");
-                                            Map<String, MediaType> mediaTypes = expectedValueOf(ifNotEmpty(b.getContent()).orElse(null), "Request body content");
-                                            return
-                                                    VarSetBuilder.with("Body")
-                                                            .type("request")
-                                                            .members(
-                                                                    instanceDefinedVar(contentVarTag, Boolean.TRUE.equals(b.getRequired())),
-                                                                    mediaTypeVar(contentVarTag, mediaTypes))
-                                                            .members(
-                                                                    mediaTypeContentVars(api, contentVarTag, mediaTypes))
-                                                            .build();
-                                        }));
+        return resultFor(
+                "requestBody",
+                () -> Optional.ofNullable(body)
+                        .map(b -> resolveRequestBody(api, b))
+                        .map(b -> {
+                            String contentVarTag = contentVarTag("body");
+                            Map<String, MediaType> mediaTypes = expectedValueOf(
+                                    ifNotEmpty(b.getContent()).orElse(null),
+                                    "Request body content");
+                            return VarSetBuilder.with("Body")
+                                    .type("request")
+                                    .members(
+                                            instanceDefinedVar(contentVarTag, Boolean.TRUE.equals(b.getRequired())),
+                                            mediaTypeVar(contentVarTag, mediaTypes))
+                                    .members(mediaTypeContentVars(api, contentVarTag, mediaTypes))
+                                    .build();
+                        }));
     }
 
     /**
      * Returns the {@link IVarDef input variable definition} for the given request body examples.
      */
     private Optional<IVarDef> requestBodyExamples(OpenAPI api, RequestBody body) {
-        return
-                resultFor("requestBody",
+        return resultFor("requestBody",
                         () ->
                                 Optional.ofNullable(body)
                                         .map(b -> resolveRequestBody(api, b))

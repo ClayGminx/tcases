@@ -111,8 +111,10 @@ public final class TcasesOpenApi {
                 for (String pathPlaceholder : pathPlaceholders) {
                     if (path.contains(pathPlaceholder)) {
                         // TODO 还需要更多检查
-                        paths.get(path).addExtension("x-business-cases",
-                                extMap.get(pathPlaceholder.substring(1, pathPlaceholder.length() - 1)));
+                        paths.get(path).addExtension(
+                                "x-business-cases",
+                                extMap.get(pathPlaceholder.substring(1, pathPlaceholder.length() - 1))
+                        );
                     }
                 }
             });

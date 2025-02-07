@@ -122,10 +122,7 @@ public class VarDef extends AbstractVarDef {
      * Returns true if the given value can be bound to this variable.
      */
     public boolean isApplicable(VarValueDef value) {
-        return
-                value.isNA()
-                        ? isOptional()
-                        : getValue(value.getName()) != null;
+        return value.isNA() ? isOptional() : getValue(value.getName()) != null;
     }
 
     /**
