@@ -26,14 +26,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.cornutum.regexpgen.RegExpGen;
 import org.cornutum.tcases.*;
 import org.cornutum.tcases.conditions.ICondition;
+import org.cornutum.tcases.resolve.DataValue;
 import org.cornutum.tcases.resolve.DataValues;
 import org.cornutum.tcases.resolve.FormattedString;
+import org.cornutum.tcases.resolve.SchemaBuilder;
 import org.cornutum.tcases.util.Characters;
 import org.cornutum.tcases.util.ContextHandler;
 import org.cornutum.tcases.util.ListBuilder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -848,33 +851,29 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      */
     private IVarDef parameterVarDef(OpenAPI api, Parameter parameter) {
         String parameterName = parameter.getName();
-        return
-                resultFor(parameterName,
-                        () ->
-                        {
-                            String parameterIn = expectedValueOf(parameter.getIn(), "in", parameterName);
-                            if (parameterIn.equals("cookie") && !Characters.TOKEN.allowed(parameterName)) {
-                                throw new IllegalStateException(String.format("Parameter name='%s' contains characters not allowed in a cookie name", parameterName));
-                            }
+        return resultFor(parameterName, () -> {
+            String parameterIn = expectedValueOf(parameter.getIn(), "in", parameterName);
+            if (parameterIn.equals("cookie") && !Characters.TOKEN.allowed(parameterName)) {
+                throw new IllegalStateException(String.format("Parameter name='%s' contains characters not allowed in a cookie name", parameterName));
+            }
 
-                            // Normalize parameter properties
-                            Schema<?> parameterSchema = parameterSchema(api, parameter);
-                            String parameterType = parameterSchema.getType();
-                            parameter.setStyle(parameterStyle(parameter, parameterType));
-                            parameter.setExplode(parameterExplode(parameter.getExplode(), getValidTypes(parameterSchema), parameter.getStyle()));
+            // Normalize parameter properties
+            Schema<?> parameterSchema = parameterSchema(api, parameter);
+            String parameterType = parameterSchema.getType();
+            parameter.setStyle(parameterStyle(parameter, parameterType));
+            parameter.setExplode(parameterExplode(parameter.getExplode(), getValidTypes(parameterSchema), parameter.getStyle()));
 
-                            // Normalize parameter schema
-                            normalizeParameterDnf(parameter, parameterSchema);
+            // Normalize parameter schema
+            normalizeParameterDnf(parameter, parameterSchema);
 
-                            String parameterVarName = toIdentifier(parameterName);
-                            return
-                                    VarSetBuilder.with(parameterVarName)
-                                            .type(parameter.getIn())
-                                            .has("paramName", parameterName)
-                                            .members(parameterDefinedVar(parameterVarName, parameter))
-                                            .members(instanceSchemaVars(parameterVarName, parameterSchema))
-                                            .build();
-                        });
+            String parameterVarName = toIdentifier(parameterName);
+            return VarSetBuilder.with(parameterVarName)
+                    .type(parameter.getIn())
+                    .has("paramName", parameterName)
+                    .members(parameterDefinedVar(parameterVarName, parameter))
+                    .members(instanceSchemaVars(parameterVarName, parameterSchema))
+                    .build();
+        });
     }
 
     /**
@@ -1401,11 +1400,10 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * Returns the type-specific {@link IVarDef input variables} defined by every alternative schema for the given instance.
      */
     private Stream<IVarDef> allSchemaVars(String instanceType, String instanceVarTag, boolean instanceOptional, Schema<?> instanceSchema, boolean instanceItem) {
-        List<Schema<?>> alternatives =
-                Optional.ofNullable(instanceSchema)
-                        .flatMap(s -> Optional.ofNullable(getDnf(s)))
-                        .map(dnf -> simplified(dnf).getAlternatives())
-                        .orElse(emptyList());
+        List<Schema<?>> alternatives = Optional.ofNullable(instanceSchema)
+                .flatMap(s -> Optional.ofNullable(getDnf(s)))
+                .map(dnf -> simplified(dnf).getAlternatives())
+                .orElse(emptyList());
 
         return
                 alternatives.isEmpty() ?
@@ -1799,11 +1797,10 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
      * Returns the {@link IVarDef input variable} representing the values for a number instance.
      */
     private IVarDef numberValueVar(String instanceVarTag, Schema<?> instanceSchema, boolean instanceItem) {
-        VarSetBuilder value =
-                VarSetBuilder.with("Value")
-                        .has("format", instanceSchema.getFormat())
-                        .has("default", Objects.toString(instanceSchema.getDefault(), null))
-                        .when(has(instanceValueProperty(instanceVarTag)));
+        VarSetBuilder value = VarSetBuilder.with("Value")
+                .has("format", instanceSchema.getFormat())
+                .has("default", Objects.toString(instanceSchema.getDefault(), null))
+                .when(has(instanceValueProperty(instanceVarTag)));
 
         // Define values for the number quantity
         VarDefBuilder quantity = VarDefBuilder.with("Is");
@@ -1839,20 +1836,19 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
                             .build());
 
             for (BigDecimal n : boundaryValues) {
-                quantity.values
-                        (VarValueDefBuilder.with(n)
-                                .type(
-                                        notEnums.contains(n)
-                                                ? VarValueDef.Type.FAILURE
-                                                : VarValueDef.Type.VALID)
-                                .build());
+                quantity.values(
+                        VarValueDefBuilder.with(n)
+                                .type(notEnums.contains(n) ? VarValueDef.Type.FAILURE : VarValueDef.Type.VALID)
+                                .build()
+                );
             }
 
             quantity.values(
                     VarValueDefBuilder.with("> 0")
                             .hasIf("excluded", notEnums)
                             .properties(unboundedProperty)
-                            .build());
+                            .build()
+            );
         } else {
             // Yes, add min/max boundary condition values
             BigDecimal unit =
@@ -1895,20 +1891,30 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
                 boundaryValues.add(multipleAbove(maximum, false, effectiveMultipleOf, notMultipleOfs));
             }
             if (effectiveMinimum != null && maximum != null) {
-                // 增加中间值 TODO 待改为随机值
-                BigDecimal middle = maximum.subtract(effectiveMinimum).divideToIntegralValue(BigDecimal.valueOf(2));
+                // 增加中间值
+                Random random = new Random();
+                BigDecimal range = maximum.subtract(effectiveMinimum);
+                BigDecimal randomValue = BigDecimal.valueOf(random.nextDouble());
+                BigDecimal r = effectiveMinimum.add(randomValue.multiply(range));
+                BigDecimal middle = r.setScale(effectiveMinimum.scale(), RoundingMode.HALF_UP);
                 boundaryValues.add(middle);
             }
             boundaryValues.addAll(notEnums);
 
             for (BigDecimal n : boundaryValues) {
-                quantity.values
-                        (VarValueDefBuilder.with(n)
+                quantity.values(
+                        VarValueDefBuilder
+                                .with(n)
                                 .type(
-                                        notEnums.contains(n) || (effectiveMinimum != null && n.compareTo(effectiveMinimum) < 0) || (maximum != null && n.compareTo(maximum) > 0)
+                                        notEnums.contains(n)
+                                                || (effectiveMinimum != null && n.compareTo(effectiveMinimum) < 0)
+                                                || (maximum != null && n.compareTo(maximum) > 0)
+
                                                 ? VarValueDef.Type.FAILURE
-                                                : VarValueDef.Type.VALID)
-                                .build());
+                                                : VarValueDef.Type.VALID
+                                )
+                                .build()
+                );
             }
 
             // For any missing boundary, add a value designating an unbounded range
@@ -1916,20 +1922,21 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
                 quantity.values(
                         VarValueDefBuilder.with(String.format("< %s", maximum))
                                 .properties(unboundedProperty)
-                                .build());
+                                .build()
+                );
             } else if (maximum == null) {
                 quantity.values(
                         VarValueDefBuilder.with(String.format("> %s", effectiveMinimum))
                                 .properties(unboundedProperty)
-                                .build());
+                                .build()
+                );
             } else {
                 // When fully bounded, select specific values to designate failures for any (not-)multiple-of constraints.
                 if (multipleOf != null) {
                     // Select a value within bounds that fails the multiple-of constraint.
-                    BigDecimal notMultipleUnit =
-                            isMultipleOf(unit, multipleOf)
-                                    ? new BigDecimal(BigInteger.ONE, multipleOf.scale() + 1)
-                                    : unit;
+                    BigDecimal notMultipleUnit = isMultipleOf(unit, multipleOf)
+                            ? new BigDecimal(BigInteger.ONE, multipleOf.scale() + 1)
+                            : unit;
 
                     BigDecimal multipleOfFailure;
                     for (multipleOfFailure = effectiveMinimum.add(notMultipleUnit);
@@ -1940,7 +1947,8 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
                         quantity.values(
                                 VarValueDefBuilder.with(multipleOfFailure)
                                         .type(VarValueDef.Type.FAILURE)
-                                        .build());
+                                        .build()
+                        );
                     }
 
                     // Maximum values in this bounded range can be defined.

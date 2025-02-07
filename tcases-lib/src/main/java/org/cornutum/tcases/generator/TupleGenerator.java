@@ -19,6 +19,7 @@ import org.cornutum.tcases.util.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static java.util.stream.Collectors.toList;
@@ -317,7 +318,8 @@ public class TupleGenerator implements ITestCaseGenerator {
                     String pathName = varDef.getPathName();
                     if ("Body.Defined".equals(pathName)
                             || "Body.Media-Type".equals(pathName)
-                            || "Body.application-json.Type".equals(pathName)) {
+                            || "Body.application-json.Type".equals(pathName)
+                            || "Body.application-json.Value.Properties.Additional".equals(pathName)) {
                         onlyDefinedTestCase.addCompatible(tuple);
                     } else {
                         // 找到形如Body.application-json.Value.Properties.id的节点
@@ -722,17 +724,80 @@ public class TupleGenerator implements ITestCaseGenerator {
             }
         }
 
-        // TODO 增加反用例
+        addMoreFailureCases(failureCases, inputDef, validTuples);
 
         logger_.info("{}: Created {} failure test cases", inputDef, failureCases.size());
         return failureCases;
     }
 
     /**
+     * TODO 增加更多反用例
+     * @param failureCases 反用例集
+     * @param inputDef 函数输入定义
+     * @param validTuples 合法输入元组集
+     */
+    private void addMoreFailureCases(List<TestCaseDef> failureCases,
+                                     FunctionInputDef inputDef,
+                                     VarTupleSet validTuples) {
+
+        // 判断是否需要扩展用例
+        FieldMapping useCaseExtensions = inputDef.getUseCaseExtensions();
+        if (useCaseExtensions != null) {
+            // 是的，需要扩展
+            logger_.info("{}: Adding more failure test cases", inputDef);
+
+            // 与数据库哪个`table`和`field`有关
+            String tableName = useCaseExtensions.getTableName();
+            String fieldName = useCaseExtensions.getTableFieldName();
+
+            // 遍历所有合法输入元组，并为关键的字段设置不存在于数据库的值
+            List<Tuple> tupleList = new ArrayList<>();
+            Long min = null, max = null;
+            VarDef oneVarDef = null;
+            VarValueDef oneVarValueDef;
+            for (Iterator<Tuple> tupleIter = validTuples.getUsed(); tupleIter.hasNext(); ) {
+                Tuple tuple = tupleIter.next();
+                for (Iterator<VarBindingDef> bindingsIter = tuple.getBindings(); bindingsIter.hasNext(); ) {
+                    VarBindingDef varBindingDef = bindingsIter.next();
+                    VarDef varDef = varBindingDef.getVarDef();
+
+                    if ("path".equals(varDef.getType()) && "Is".equals(varDef.getName())) {
+                        VarValueDef valueDef = varBindingDef.getValueDef();
+                        long value = ((BigDecimal) valueDef.getName()).longValue();
+                        if (min == null || value < min) {
+                            min = value;
+                        }
+                        if (max == null || value > max) {
+                            max = value;
+                        }
+
+                        oneVarDef = varDef;
+                    } else {
+                        tupleList.add(tuple);
+                    }
+                }
+            }
+            Long fieldValue = SqliteQuery.getNotExistingValue(tableName, fieldName, min, max);
+            if (fieldValue != null && oneVarDef != null) {
+                TestCaseDef testCaseDef = new TestCaseDef();
+                testCaseDef.setName("petId.TrueValue.Is='" + fieldValue + "'");
+                for (Tuple tuple : tupleList) {
+                    testCaseDef.addCompatible(tuple);
+                }
+                oneVarValueDef = VarValueDefBuilder.with(fieldValue).build();
+                oneVarValueDef.setType(VarValueDef.Type.FAILURE);
+                oneVarDef.addValue(oneVarValueDef);
+                testCaseDef.addCompatible(new Tuple(new VarBindingDef(oneVarDef, oneVarValueDef)));
+                failureCases.add(testCaseDef);
+            }
+        }
+    }
+
+    /**
      * Returns the all failure input tuples required for generated test cases.
      */
     private VarTupleSet getFailureTupleSet(RandSeq randSeq, FunctionInputDef inputDef) {
-        List<Tuple> failureTuples = new ArrayList<Tuple>();
+        List<Tuple> failureTuples = new ArrayList<>();
 
         for (VarDefIterator vars = new VarDefIterator(inputDef); vars.hasNext(); ) {
             VarDef var = vars.next();
