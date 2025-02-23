@@ -119,7 +119,7 @@ public class VarBindingDef implements IConditional {
                 new StringBuilder()
                         .append(getVarDef() == null ? ":" : getVarDef().getName())
                         .append('=')
-                        .append(getValueDef() == null ? ":" : getValueDef().isNA() ? "N/A" : getValueDef().getName())
+                        .append(getValueDef() == null ? ":" : getValueDef().isNA() ? "N/A" : String.valueOf(getValueDef().getName()))
                         .toString();
     }
 

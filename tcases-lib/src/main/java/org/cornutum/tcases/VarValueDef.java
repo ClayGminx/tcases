@@ -142,7 +142,7 @@ public class VarValueDef extends Conditional {
      * Changes the set of test case properties contributed by this value.
      */
     public void setProperties(Collection<String> properties) {
-        properties_ = new HashSet<String>();
+        properties_ = new HashSet<>();
         addProperties(properties);
     }
 
@@ -225,26 +225,19 @@ public class VarValueDef extends Conditional {
                         ? (VarValueDef) object
                         : null;
 
-        return
-                other != null
-                        && Objects.equals(other.getExternalName(), getExternalName())
-                        && Objects.equals(other.getType(), getType());
+        return other != null
+                && Objects.equals(other.getExternalName(), getExternalName())
+                && Objects.equals(other.getType(), getType());
     }
 
     @Override
     public int hashCode() {
-        return
-                getClass().hashCode()
-                        ^ Objects.hashCode(getExternalName())
-                        ^ Objects.hashCode(getType());
+        return getClass().hashCode() ^ Objects.hashCode(getExternalName()) ^ Objects.hashCode(getType());
     }
 
     @Override
     public String toString() {
-        return
-                ToString.getBuilder(this)
-                        .append(getName())
-                        .toString();
+        return ToString.getBuilder(this).append(getName()).toString();
     }
 
     /**

@@ -138,7 +138,7 @@ public class RequestCase implements Comparable<RequestCase> {
      * Changes the parameter definitions for this request.
      */
     public void setParams(Iterable<ParamData> params) {
-        params_ = new ArrayList<ParamData>();
+        params_ = new ArrayList<>();
         if (params != null) {
             for (ParamData param : params) {
                 addParam(param);
@@ -178,7 +178,7 @@ public class RequestCase implements Comparable<RequestCase> {
      * Changes the authentication definitions for this request.
      */
     public void setAuthDefs(Iterable<AuthDef> authDefs) {
-        authDefs_ = new ArrayList<AuthDef>();
+        authDefs_ = new ArrayList<>();
         if (authDefs != null) {
             for (AuthDef authDef : authDefs) {
                 addAuthDef(authDef);
@@ -237,51 +237,42 @@ public class RequestCase implements Comparable<RequestCase> {
 
     @Override
     public int compareTo(RequestCase other) {
-        return
-                Comparator.comparing(RequestCase::getApi)
-                        .thenComparing(RequestCase::getPath)
-                        .thenComparing(RequestCase::getOperation)
-                        .thenComparingInt(RequestCase::getId)
-                        .compare(this, other);
+        return Comparator.comparing(RequestCase::getApi)
+                         .thenComparing(RequestCase::getPath)
+                         .thenComparing(RequestCase::getOperation)
+                         .thenComparingInt(RequestCase::getId)
+                         .compare(this, other);
     }
 
     @Override
     public boolean equals(Object object) {
-        RequestCase other =
-                object instanceof RequestCase
-                        ? (RequestCase) object
-                        : null;
+        RequestCase other = object instanceof RequestCase ? (RequestCase) object : null;
 
-        return
-                other != null
-                        && other.getId() == getId()
-                        && Objects.equals(other.getApi(), getApi())
-                        && Objects.equals(other.getPath(), getPath())
-                        && Objects.equals(other.getOperation(), getOperation())
-                ;
+        return other != null
+                && other.getId() == getId()
+                && Objects.equals(other.getApi(), getApi())
+                && Objects.equals(other.getPath(), getPath())
+                && Objects.equals(other.getOperation(), getOperation());
     }
 
     @Override
     public int hashCode() {
-        return
-                getClass().hashCode()
-                        ^ getId()
-                        ^ Objects.hashCode(getApi())
-                        ^ Objects.hashCode(getPath())
-                        ^ Objects.hashCode(getOperation())
-                ;
+        return getClass().hashCode()
+                ^ getId()
+                ^ Objects.hashCode(getApi())
+                ^ Objects.hashCode(getPath())
+                ^ Objects.hashCode(getOperation());
     }
 
     @Override
     public String toString() {
-        return
-                ToString.getBuilder(this)
-                        .append(getId())
-                        .append(getName())
-                        .append(getOperation())
-                        .append(getPath())
-                        .append(isFailure() ? "FAILURE" : "SUCCESS")
-                        .toString();
+        return ToString.getBuilder(this)
+                       .append(getId())
+                       .append(getName())
+                       .append(getOperation())
+                       .append(getPath())
+                       .append(isFailure() ? "FAILURE" : "SUCCESS")
+                       .toString();
     }
 
     private final int id_;

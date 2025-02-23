@@ -60,7 +60,7 @@ public class SqliteQuery {
     }
 
     private static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:sqlite:/Users/joseph/Downloads/tcases/petstore.db");
+        return DriverManager.getConnection("jdbc:sqlite:D:/User/default/tcases/petstore.db");
     }
 
     public static void main(String[] args) {

@@ -337,131 +337,161 @@ public class ApiCommand {
         protected int handleOption(String[] args, int i) {
             String arg = args[i];
 
-            if (arg.equals("-help")) {
-                // 获取帮助
-                throwHelpException();
-            } else if (arg.equals("-o")) {
-                // 输出目录
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                setOutDir(new File(args[i]));
-            } else if (arg.equals("-c")) {
-                // 条件通知器
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                setConditionNotifiers(args[i]);
-            } else if (arg.equals("-f")) {
-                // 输出文件
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                setOutFile(new File(args[i]));
-            } else if (arg.equals("-R")) {
-                // 读写属性
-                setReadOnlyEnforced(true);
-            } else if (arg.equals("-W")) {
-                // 读写属性
-                setWriteOnlyEnforced(true);
-            } else if (arg.equals("-T")) {
-                // 内容类型
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                try {
-                    setContentType(args[i]);
-                } catch (Exception e) {
-                    throwUsageException("Invalid content type", e);
-                }
-            } else if (arg.equals("-v")) {
-                // 版本
-                setShowVersion(true);
-            } else if (arg.equals("-C")) {
-                // 服务器测试
-                setServerTest(false);
-            } else if (arg.equals("-S")) {
-                // 服务器测试
-                setServerTest(true);
-            } else if (arg.equals("-D")) {
-                // OpenAPI
-                setRequestCases(true);
-            } else if (arg.equals("-X")) {
-                // 使用示例
-                setSource(ModelOptions.Source.EXAMPLES);
-            } else if (arg.equals("-I")) {
-                // 测试
-                setTests(false);
-            } else if (arg.equals("-J")) {
-                if (getTransformType() != null) {
-                    throwUsageException("Can't specify multiple output transforms");
-                }
-                setTransformType(TransformType.JUNIT);
-            } else if (arg.equals("-H")) {
-                if (getTransformType() != null) {
-                    throwUsageException("Can't specify multiple output transforms");
-                }
-                setTransformType(TransformType.HTML);
-            } else if (arg.equals("-x")) {
-                if (getTransformType() != null) {
-                    throwUsageException("Can't specify multiple output transforms");
-                }
-                setTransformType(TransformType.CUSTOM);
+            switch (arg) {
+                case "-help":
+                    // 获取帮助
+                    throwHelpException();
+                    break;
+                case "-o":
+                    // 输出目录
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setOutDir(new File(args[i]));
+                    break;
+                case "-c":
+                    // 条件通知器
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setConditionNotifiers(args[i]);
+                    break;
+                case "-f":
+                    // 输出文件
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setOutFile(new File(args[i]));
+                    break;
+                case "-R":
+                    // 读写属性
+                    setReadOnlyEnforced(true);
+                    break;
+                case "-W":
+                    // 读写属性
+                    setWriteOnlyEnforced(true);
+                    break;
+                case "-T":
+                    // 内容类型
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    try {
+                        setContentType(args[i]);
+                    } catch (Exception e) {
+                        throwUsageException("Invalid content type", e);
+                    }
+                    break;
+                case "-v":
+                    // 版本
+                    setShowVersion(true);
+                    break;
+                case "-C":
+                    // 服务器测试
+                    setServerTest(false);
+                    break;
+                case "-S":
+                    // 服务器测试
+                    setServerTest(true);
+                    break;
+                case "-D":
+                    // OpenAPI
+                    setRequestCases(true);
+                    break;
+                case "-X":
+                    // 使用示例
+                    setSource(ModelOptions.Source.EXAMPLES);
+                    break;
+                case "-I":
+                    // 测试
+                    setTests(false);
+                    break;
+                case "-J":
+                    if (getTransformType() != null) {
+                        throwUsageException("Can't specify multiple output transforms");
+                    }
+                    setTransformType(TransformType.JUNIT);
+                    break;
+                case "-H":
+                    if (getTransformType() != null) {
+                        throwUsageException("Can't specify multiple output transforms");
+                    }
+                    setTransformType(TransformType.HTML);
+                    break;
+                case "-x":
+                    if (getTransformType() != null) {
+                        throwUsageException("Can't specify multiple output transforms");
+                    }
+                    setTransformType(TransformType.CUSTOM);
 
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                setTransformDef(new File(args[i]));
-            } else if (arg.equals("-p")) {
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                String binding = args[i];
-                int valuePos = binding.indexOf('=');
-                if (valuePos < 0) {
-                    throwUsageException("Invalid -p option: must be name=value");
-                }
-                String name = StringUtils.trimToNull(binding.substring(0, valuePos));
-                if (name == null) {
-                    throwUsageException("Invalid -p option: parameter name undefined");
-                }
-                String value = binding.substring(valuePos + 1);
-                getTransformParams().put(name, value);
-            } else if (arg.equals("-r")) {
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                try {
-                    setRandomSeed(Long.valueOf(args[i]));
-                } catch (Exception e) {
-                    throwUsageException("Invalid random seed", e);
-                }
-            } else if (arg.equals("-m")) {
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                try {
-                    setMaxTries(Integer.parseInt(args[i]));
-                } catch (Exception e) {
-                    throwUsageException("Invalid max tries", e);
-                }
-            } else if (arg.equals("-E")) {
-                // 扩展OpenAPI
-                i++;
-                if (i >= args.length) {
-                    throwMissingValue(arg);
-                }
-                setExtensionFile(new File(args[i]));
-            } else {
-                throwUsageException(String.format("Unknown option: %s", arg));
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setTransformDef(new File(args[i]));
+                    break;
+                case "-p":
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    String binding = args[i];
+                    int valuePos = binding.indexOf('=');
+                    if (valuePos < 0) {
+                        throwUsageException("Invalid -p option: must be name=value");
+                    }
+                    String name = StringUtils.trimToNull(binding.substring(0, valuePos));
+                    if (name == null) {
+                        throwUsageException("Invalid -p option: parameter name undefined");
+                    }
+                    String value = binding.substring(valuePos + 1);
+                    getTransformParams().put(name, value);
+                    break;
+                case "-r":
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    try {
+                        setRandomSeed(Long.valueOf(args[i]));
+                    } catch (Exception e) {
+                        throwUsageException("Invalid random seed", e);
+                    }
+                    break;
+                case "-m":
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    try {
+                        setMaxTries(Integer.parseInt(args[i]));
+                    } catch (Exception e) {
+                        throwUsageException("Invalid max tries", e);
+                    }
+                    break;
+                case "-E":
+                    // 扩展OpenAPI
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setExtensionFile(new File(args[i]));
+                    break;
+                case "-k":
+                    // 减少用例
+                    i++;
+                    if (i >= args.length) {
+                        throwMissingValue(arg);
+                    }
+                    setLessenFile(new File(args[i]));
+                    break;
+                default:
+                    throwUsageException(String.format("Unknown option: %s", arg));
+                    break;
             }
 
             return i + 1;
@@ -940,6 +970,16 @@ public class ApiCommand {
         }
 
         /**
+         * 设置用于减少用例的文件
+         * <p/>
+         * 有的用户认为此工具生成的用例是多余的，对此可以传入这种文件，
+         * 以减少用例。
+         */
+        public void setLessenFile(File lessenFile) {
+            getModelOptions().setLessenFile(lessenFile);
+        }
+
+        /**
          * Returns a new Options builder.
          */
         public static Builder builder() {
@@ -1184,7 +1224,7 @@ public class ApiCommand {
      * Generates input models and test models for API clients and servers, based on an OpenAPI v3 compliant API definition,
      * using the given {@link Options command line options}.
      */
-    public static void run(Options options) throws Exception {
+    public static void run(Options options) {
         if (options.showVersion()) {
             System.out.println(getVersion());
             return;

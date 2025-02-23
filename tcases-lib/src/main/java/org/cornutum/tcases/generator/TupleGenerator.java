@@ -12,6 +12,8 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.cornutum.tcases.*;
+import org.cornutum.tcases.common.LessenCommand;
+import org.cornutum.tcases.common.LessenCommandName;
 import org.cornutum.tcases.openapi.db.SqliteQuery;
 import org.cornutum.tcases.openapi.mapping.FieldMapping;
 import org.cornutum.tcases.util.CartesianProduct;
@@ -67,7 +69,7 @@ public class TupleGenerator implements ITestCaseGenerator {
      * Changes the list of {@link TupleCombiner tuple combiners} for this generator.
      */
     public void setCombiners(List<TupleCombiner> combiners) {
-        combiners_ = new ArrayList<TupleCombiner>();
+        combiners_ = new ArrayList<>();
         if (combiners != null) {
             combiners_.addAll(combiners);
         }
@@ -138,8 +140,8 @@ public class TupleGenerator implements ITestCaseGenerator {
             logger_.info("{}: Completed {} test cases", inputDef, testCaseDefs.size());
             return testCaseDefs;
         } catch (Exception e) {
-            logger_.error(String.valueOf(inputDef) + ": Can't create test cases", e);
-            throw new RuntimeException(String.valueOf(inputDef) + ": Can't create test cases", e);
+            logger_.error(inputDef + ": Can't create test cases", e);
+            throw new RuntimeException(inputDef + ": Can't create test cases", e);
         }
     }
 
@@ -151,7 +153,7 @@ public class TupleGenerator implements ITestCaseGenerator {
     private List<TestCaseDef> getBaseCases(FunctionInputDef inputDef, FunctionTestDef baseTests) {
         logger_.debug("{}: Creating base test cases", inputDef);
 
-        List<TestCaseDef> testCases = new ArrayList<TestCaseDef>();
+        List<TestCaseDef> testCases = new ArrayList<>();
         if (baseTests != null) {
             // For each base test case...
             for (Iterator<TestCase> baseCases = baseTests.getTestCases();
@@ -182,9 +184,7 @@ public class TupleGenerator implements ITestCaseGenerator {
                     // Value type unchanged?
                     else if (value.isValid() != binding.isValueValid()) {
                         // No, can't preserve this base test.
-                        logger_.debug
-                                ("Can't add {}, {} changed to failure={}",
-                                        new Object[]{baseTest, binding, !value.isValid()});
+                        logger_.debug("Can't add {}, {} changed to failure={}", baseTest, binding, !value.isValid());
                         testCase = null;
                     } else {
                         // Add variable binding if still compatible.
@@ -207,7 +207,7 @@ public class TupleGenerator implements ITestCaseGenerator {
      * Returns a set of valid {@link TestCaseDef test case definitions} that extend the given base test cases.
      */
     private List<TestCaseDef> extendBaseCases(FunctionInputDef inputDef, VarTupleSet validTuples, Iterator<TestCaseDef> baseCases) {
-        List<TestCaseDef> testCases = new ArrayList<TestCaseDef>();
+        List<TestCaseDef> testCases = new ArrayList<>();
 
         // For each base test case...
         while (baseCases.hasNext()) {
@@ -650,7 +650,7 @@ public class TupleGenerator implements ITestCaseGenerator {
      * Returns the all valid input tuples required for generated test cases.
      */
     private VarTupleSet getValidTupleSet(RandSeq randSeq, FunctionInputDef inputDef) {
-        List<Tuple> validTuples = new ArrayList<Tuple>();
+        List<Tuple> validTuples = new ArrayList<>();
 
         // Get tuple sets required for each specified combiner, ordered for "greedy" processing, i.e. biggest tuples first.
         // For this purpose, "all permutations" is considered the maximum tuple size, even though in practice it might not be.
@@ -661,10 +661,7 @@ public class TupleGenerator implements ITestCaseGenerator {
 
         // For all input variables that do not belong to a combiner tuple set...
         List<VarDef> uncombinedVars =
-                IteratorUtils.toList(
-                        IteratorUtils.filteredIterator(
-                                new VarDefIterator(inputDef),
-                                this::isUncombined));
+                IteratorUtils.toList(IteratorUtils.filteredIterator(new VarDefIterator(inputDef), this::isUncombined));
 
         if (!uncombinedVars.isEmpty()) {
             // ... add the default tuples.
@@ -675,10 +672,10 @@ public class TupleGenerator implements ITestCaseGenerator {
                             randSeq,
                             getUncombinedTuples(
                                     uncombinedVars,
-                                    Math.min(
-                                            varCount,
-                                            defaultTupleSize < 1 ? varCount : defaultTupleSize))));
+                                    Math.min(varCount, defaultTupleSize < 1 ? varCount : defaultTupleSize))));
         }
+
+        // TODO 去掉不要的元组
 
         return new VarTupleSet(validTuples);
     }
@@ -798,11 +795,40 @@ public class TupleGenerator implements ITestCaseGenerator {
      */
     private VarTupleSet getFailureTupleSet(RandSeq randSeq, FunctionInputDef inputDef) {
         List<Tuple> failureTuples = new ArrayList<>();
+        List<LessenCommand> lessenCommands = inputDef.getLessenCommands();
 
         for (VarDefIterator vars = new VarDefIterator(inputDef); vars.hasNext(); ) {
             VarDef var = vars.next();
+            VAR_VALUE:
             for (Iterator<VarValueDef> failures = var.getFailureValues(); failures.hasNext(); ) {
-                failureTuples.add(new Tuple(new VarBindingDef(var, failures.next())));
+                VarValueDef varValue = failures.next();
+
+                if (lessenCommands != null) {
+                    for (LessenCommand lessenCommand : lessenCommands) {
+                        if (var.getName().equals(lessenCommand.getVarName())) {
+
+                            if (lessenCommand.getVarValue() != null && lessenCommand.getVarValue().equals(String.valueOf(varValue.getName()))) {
+                                if (LessenCommandName.EXCLUDE.equals(lessenCommand.getCommandName())) {
+                                    continue VAR_VALUE;
+                                }
+                            }
+
+                            if (("integer".equals(lessenCommand.getVarType()) && varValue.getName() instanceof BigDecimal) &&
+                                    ("invalid".equals(lessenCommand.getKind())) &&
+                                    (LessenCommandName.EXCLUDE.equals(lessenCommand.getCommandName()))) {
+                                continue VAR_VALUE;
+                            }
+
+                            if (("integer".equals(lessenCommand.getVarType()) && varValue.getName() instanceof BigDecimal) &&
+                                    ("valid".equals(lessenCommand.getKind())) &&
+                                    (LessenCommandName.ONLY.equals(lessenCommand.getCommandName()))) {
+                                continue VAR_VALUE;
+                            }
+                        }
+                    }
+                }
+
+                failureTuples.add(new Tuple(new VarBindingDef(var, varValue)));
             }
         }
 
@@ -834,7 +860,7 @@ public class TupleGenerator implements ITestCaseGenerator {
      * Returns the set of bindings that provide at least one of the given properties
      */
     private Set<VarBindingDef> getPropertyProviders(Set<String> properties) {
-        Set<VarBindingDef> bindings = new HashSet<VarBindingDef>();
+        Set<VarBindingDef> bindings = new HashSet<>();
         for (String property : properties) {
             bindings.addAll(propertyProviders_.get(property));
         }
@@ -885,7 +911,7 @@ public class TupleGenerator implements ITestCaseGenerator {
                         return score;
                     }
 
-                    private Map<VarBindingDef, Integer> bindingScores_ = new HashMap<VarBindingDef, Integer>();
+                    private Map<VarBindingDef, Integer> bindingScores_ = new HashMap<>();
                 };
     }
 
@@ -932,41 +958,35 @@ public class TupleGenerator implements ITestCaseGenerator {
     private static final Logger logger_ = LoggerFactory.getLogger(TupleGenerator.class);
 
     private static final Comparator<VarBindingDef> varBindingDefSorter_ =
-            new Comparator<VarBindingDef>() {
-                @Override
-                public int compare(VarBindingDef binding1, VarBindingDef binding2) {
-                    String var1 = binding1.getVarDef().getPathName();
-                    String var2 = binding2.getVarDef().getPathName();
-                    int result = var1.compareTo(var2);
-                    if (result == 0) {
-                        String value1 = String.valueOf(binding1.getValueDef().getName());
-                        String value2 = String.valueOf(binding2.getValueDef().getName());
-                        result = value1.compareTo(value2);
-                    }
-
-                    return result;
+            (binding1, binding2) -> {
+                String var1 = binding1.getVarDef().getPathName();
+                String var2 = binding2.getVarDef().getPathName();
+                int result = var1.compareTo(var2);
+                if (result == 0) {
+                    String value1 = String.valueOf(binding1.getValueDef().getName());
+                    String value2 = String.valueOf(binding2.getValueDef().getName());
+                    result = value1.compareTo(value2);
                 }
+
+                return result;
             };
 
     private static final Comparator<Set<VarBindingDef>> varBindingSetSorter_ =
-            new Comparator<Set<VarBindingDef>>() {
-                @Override
-                public int compare(Set<VarBindingDef> bindingSet1, Set<VarBindingDef> bindingSet2) {
-                    int result = bindingSet1.size() - bindingSet2.size();
-                    if (result == 0) {
-                        Iterator<VarBindingDef> bindings1;
-                        Iterator<VarBindingDef> bindings2;
-                        for (bindings1 = bindingSet1.iterator(),
-                                     bindings2 = bindingSet2.iterator();
+            (bindingSet1, bindingSet2) -> {
+                int result = bindingSet1.size() - bindingSet2.size();
+                if (result == 0) {
+                    Iterator<VarBindingDef> bindings1;
+                    Iterator<VarBindingDef> bindings2;
+                    for (bindings1 = bindingSet1.iterator(),
+                                 bindings2 = bindingSet2.iterator();
 
-                             bindings1.hasNext()
-                                     && (result = varBindingDefSorter_.compare(bindings1.next(), bindings2.next())) == 0;
-                        )
-                            ;
-                    }
-
-                    return result;
+                         bindings1.hasNext()
+                                 && (result = varBindingDefSorter_.compare(bindings1.next(), bindings2.next())) == 0;
+                    )
+                        ;
                 }
+
+                return result;
             };
 
     private static final Comparator<TupleCombiner> byTupleSize_ =

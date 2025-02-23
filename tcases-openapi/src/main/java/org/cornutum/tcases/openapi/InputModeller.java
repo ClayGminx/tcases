@@ -26,10 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.cornutum.regexpgen.RegExpGen;
 import org.cornutum.tcases.*;
 import org.cornutum.tcases.conditions.ICondition;
-import org.cornutum.tcases.resolve.DataValue;
 import org.cornutum.tcases.resolve.DataValues;
 import org.cornutum.tcases.resolve.FormattedString;
-import org.cornutum.tcases.resolve.SchemaBuilder;
 import org.cornutum.tcases.util.Characters;
 import org.cornutum.tcases.util.ContextHandler;
 import org.cornutum.tcases.util.ListBuilder;
@@ -200,6 +198,7 @@ public abstract class InputModeller extends ContextHandler<OpenApiContext> {
                                                 .has("operation", opName)
                                                 .vars(opRequestVars(api, pathItem, op))
                                                 .extensions(pathItem.getExtensions())
+                                                .extensions(api.getExtensions())
                                                 .build());
     }
 

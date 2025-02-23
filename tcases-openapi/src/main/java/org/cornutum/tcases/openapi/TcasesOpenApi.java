@@ -10,9 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
 import org.cornutum.tcases.SystemInputDef;
+import org.cornutum.tcases.common.LessenCommand;
+import org.cornutum.tcases.common.LessenCommandUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,7 +47,7 @@ public final class TcasesOpenApi {
     public static SystemInputDef getRequestInputModel(OpenAPI api, ModelOptions options) {
         RequestInputModeller inputModeller = new RequestInputModeller(options);
         if (options != null) {
-            customOpenAPI(api, options.getExtensionFile());
+            customOpenAPI(api, options.getExtensionFile(), options.getLessenFile());
         }
         return inputModeller.getRequestInputModel(api);
     }
@@ -80,6 +83,15 @@ public final class TcasesOpenApi {
      */
     public static SystemInputDef getRequestExamplesModel(OpenAPI api, ModelOptions options) {
         return getRequestInputModel(api, ModelOptions.builder(options).source(ModelOptions.Source.EXAMPLES).build());
+    }
+
+    private static void customOpenAPI(OpenAPI api, File extensionFile, File lessenFile) {
+        customOpenAPI(api, extensionFile);
+
+        if (lessenFile != null) {
+            List<LessenCommand> list = LessenCommandUtil.read(lessenFile);
+            api.addExtension("x-lessen-commands", list);
+        }
     }
 
     /**

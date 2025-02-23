@@ -136,6 +136,14 @@ public class ModelOptions {
         this.extensionFile_ = extensionFile_;
     }
 
+    public File getLessenFile() {
+        return lessenFile_;
+    }
+
+    public void setLessenFile(File lessenFile) {
+        this.lessenFile_ = lessenFile;
+    }
+
     /**
      * Returns a new ModelOptions builder.
      */
@@ -235,4 +243,5 @@ public class ModelOptions {
     private URI serverUri_;
     private ServerSelector serverSelector_;
     private File extensionFile_;
+    private File lessenFile_;
 }
