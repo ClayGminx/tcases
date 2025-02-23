@@ -30,7 +30,8 @@ import static org.apache.commons.collections4.functors.NOPTransformer.nopTransfo
 /**
  * Generates {@link TestCase test cases} for a {@link FunctionInputDef function} that use
  * all specified N-tuples of valid variable values.
- * <p>为一个{@link FunctionInputDef 函数}生成{@link TestCase 测试用例}。</p>
+ * <p/>
+ * 为一个{@link FunctionInputDef 函数}生成{@link TestCase 测试用例}。
  */
 public class TupleGenerator implements ITestCaseGenerator {
 
@@ -307,7 +308,7 @@ public class TupleGenerator implements ITestCaseGenerator {
         if (body != null && "request".equals(body.getType())) {
             // 需要增加用例，只为必填字段赋值
             TestCaseDef onlyDefinedTestCase = new TestCaseDef();
-            onlyDefinedTestCase.setName("Body.OnlyDefined='Yes'");
+            onlyDefinedTestCase.setName("x.Body.OnlyDefined='Yes'");
 
             int definedCount = 0;
             for (Iterator<Tuple> tupleIter = validTuples.getUsed(); tupleIter.hasNext(); ) {
@@ -360,7 +361,7 @@ public class TupleGenerator implements ITestCaseGenerator {
             Object fieldValue = SqliteQuery.getRandomValue(tableName, fieldName);
 
             TestCaseDef testCaseDef = new TestCaseDef();
-            testCaseDef.setName("petId.TrueValue.Is='" + fieldValue + "'");
+            testCaseDef.setName("x.petId.ValueFromDB.Is='" + fieldValue + "'");
             boolean added = false;
             for (Iterator<Tuple> tupleIter = validTuples.getUsed(); tupleIter.hasNext(); ) {
                 Tuple tuple = tupleIter.next();
@@ -777,7 +778,7 @@ public class TupleGenerator implements ITestCaseGenerator {
             Long fieldValue = SqliteQuery.getNotExistingValue(tableName, fieldName, min, max);
             if (fieldValue != null && oneVarDef != null) {
                 TestCaseDef testCaseDef = new TestCaseDef();
-                testCaseDef.setName("petId.TrueValue.Is='" + fieldValue + "'");
+                testCaseDef.setName("x.petId.ValueOutFromDB.Is='" + fieldValue + "'");
                 for (Tuple tuple : tupleList) {
                     testCaseDef.addCompatible(tuple);
                 }
