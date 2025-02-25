@@ -8,13 +8,12 @@
 
 package org.cornutum.tcases;
 
-import org.cornutum.tcases.common.LessenCommand;
+import org.cornutum.tcases.generator.less.LessenRules;
 import org.cornutum.tcases.openapi.mapping.FieldMapping;
 
 import static org.cornutum.tcases.util.CollectionUtils.toStream;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -78,7 +77,7 @@ public class FunctionInputDefBuilder extends AnnotatedBuilder<FunctionInputDefBu
                                                 ? VarDefBuilder.with((VarDef) v).build()
                                                 : VarSetBuilder.with((VarSet) v).build()))
                                 .useCaseExtensions(functionInputDef.getUseCaseExtensions())
-                                .lessenCommands(functionInputDef.getLessenCommands())
+                                .lessenRules(functionInputDef.getLessenRules())
                                 .annotations(f)
                                 .build())
                 .orElse(new FunctionInputDef("F"));
@@ -140,15 +139,14 @@ public class FunctionInputDefBuilder extends AnnotatedBuilder<FunctionInputDefBu
         return this;
     }
 
-    @SuppressWarnings("unchecked")
     public FunctionInputDefBuilder extensions(Map<String, Object> extensions) {
         if (extensions != null) {
             if (extensions.containsKey("x-business-cases")) {
                 Map<?, ?> ext = (Map<?, ?>) extensions.get("x-business-cases");
                 FieldMapping fieldMapping = new FieldMapping((String) ext.get("table"), (String) ext.get("model"));
                 functionInputDef_.setUseCaseExtensions(fieldMapping);
-            } else if (extensions.containsKey("x-lessen-commands")) {
-                functionInputDef_.setLessenCommands((List<LessenCommand>) extensions.get("x-lessen-commands"));
+            } else if (extensions.containsKey("x-lessen-rules")) {
+                functionInputDef_.setLessenRules((LessenRules) extensions.get("x-lessen-rules"));
             }
         }
         return this;
@@ -159,8 +157,8 @@ public class FunctionInputDefBuilder extends AnnotatedBuilder<FunctionInputDefBu
         return this;
     }
 
-    public FunctionInputDefBuilder lessenCommands(List<LessenCommand> lessenCommands) {
-        functionInputDef_.setLessenCommands(lessenCommands);
+    public FunctionInputDefBuilder lessenRules(LessenRules lessenRules) {
+        functionInputDef_.setLessenRules(lessenRules);
         return this;
     }
 

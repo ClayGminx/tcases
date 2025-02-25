@@ -9,7 +9,7 @@ package org.cornutum.tcases;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.cornutum.tcases.common.LessenCommand;
+import org.cornutum.tcases.generator.less.LessenRules;
 import org.cornutum.tcases.openapi.mapping.FieldMapping;
 import org.cornutum.tcases.util.ToString;
 
@@ -181,6 +181,6 @@ public class FunctionInputDef extends Annotated {
 
     @Getter
     @Setter
-    private List<LessenCommand> lessenCommands;
+    private LessenRules lessenRules;
 }
 

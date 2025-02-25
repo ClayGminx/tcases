@@ -12,8 +12,7 @@ import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.collections4.MultiMapUtils;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.cornutum.tcases.*;
-import org.cornutum.tcases.common.LessenCommand;
-import org.cornutum.tcases.common.LessenCommandName;
+import org.cornutum.tcases.generator.less.LessenRules;
 import org.cornutum.tcases.openapi.db.SqliteQuery;
 import org.cornutum.tcases.openapi.mapping.FieldMapping;
 import org.cornutum.tcases.util.CartesianProduct;
@@ -122,20 +121,26 @@ public class TupleGenerator implements ITestCaseGenerator {
             List<TestCaseDef> baseCases = getBaseCases(inputDef, baseTests);
             RandSeq randSeq = getRandomSeed() == null ? null : new RandSeq(getRandomSeed());
 
-            // Get all valid cases.
-            VarTupleSet validTuples = getValidTupleSet(randSeq, inputDef);
-            List<TestCaseDef> validCases = getBaseValidCases(inputDef, validTuples, baseCases);
-            validCases.addAll(getValidCases(inputDef, validTuples));
-
-            // Get all failure cases.
-            VarTupleSet failureTuples = getFailureTupleSet(randSeq, inputDef);
-            List<TestCaseDef> failureCases = getBaseFailureCases(inputDef, validTuples, failureTuples, baseCases);
-            failureCases.addAll(getFailureCases(inputDef, failureTuples, validTuples));
-
-            // Create test cases, in order of increasing id.
+            // 创建测试用例，并按id排序
             List<ITestCaseDef> testCaseDefs = new ArrayList<>();
-            testCaseDefs.addAll(validCases);
-            testCaseDefs.addAll(failureCases);
+            LessenRules lessenRules = inputDef.getLessenRules();
+
+            // 获取所有的正用例
+            VarTupleSet validTuples = getValidTupleSet(randSeq, inputDef);
+            if (lessenRules != null && lessenRules.isUseValidTuples()) {
+                List<TestCaseDef> validCases = getBaseValidCases(inputDef, validTuples, baseCases);
+                validCases.addAll(getValidCases(inputDef, validTuples));
+                testCaseDefs.addAll(validCases);
+            }
+
+            if (lessenRules != null && lessenRules.isUseFailureTuples()) {
+                // 获取所有的反用例
+                VarTupleSet failureTuples = getFailureTupleSet(randSeq, inputDef);
+                List<TestCaseDef> failureCases = getBaseFailureCases(inputDef, validTuples, failureTuples, baseCases);
+                failureCases.addAll(getFailureCases(inputDef, failureTuples, validTuples));
+                testCaseDefs.addAll(failureCases);
+            }
+
             Collections.sort(testCaseDefs);
 
             logger_.info("{}: Completed {} test cases", inputDef, testCaseDefs.size());
@@ -796,37 +801,21 @@ public class TupleGenerator implements ITestCaseGenerator {
      */
     private VarTupleSet getFailureTupleSet(RandSeq randSeq, FunctionInputDef inputDef) {
         List<Tuple> failureTuples = new ArrayList<>();
-        List<LessenCommand> lessenCommands = inputDef.getLessenCommands();
+        LessenRules lessenRules = inputDef.getLessenRules();
 
         for (VarDefIterator vars = new VarDefIterator(inputDef); vars.hasNext(); ) {
             VarDef var = vars.next();
-            VAR_VALUE:
             for (Iterator<VarValueDef> failures = var.getFailureValues(); failures.hasNext(); ) {
                 VarValueDef varValue = failures.next();
 
-                if (lessenCommands != null) {
-                    for (LessenCommand lessenCommand : lessenCommands) {
-                        if (var.getName().equals(lessenCommand.getVarName())) {
-
-                            if (lessenCommand.getVarValue() != null && lessenCommand.getVarValue().equals(String.valueOf(varValue.getName()))) {
-                                if (LessenCommandName.EXCLUDE.equals(lessenCommand.getCommandName())) {
-                                    continue VAR_VALUE;
-                                }
-                            }
-
-                            if (("integer".equals(lessenCommand.getVarType()) && varValue.getName() instanceof BigDecimal) &&
-                                    ("invalid".equals(lessenCommand.getKind())) &&
-                                    (LessenCommandName.EXCLUDE.equals(lessenCommand.getCommandName()))) {
-                                continue VAR_VALUE;
-                            }
-
-                            if (("integer".equals(lessenCommand.getVarType()) && varValue.getName() instanceof BigDecimal) &&
-                                    ("valid".equals(lessenCommand.getKind())) &&
-                                    (LessenCommandName.ONLY.equals(lessenCommand.getCommandName()))) {
-                                continue VAR_VALUE;
-                            }
-                        }
-                    }
+                if (!lessenRules.isCheckDefined() && var.getName().equals("Defined") && !varValue.isValid()) {
+                    continue;
+                }
+                if (!lessenRules.isCheckLength() && var.getName().equals("Length") && !varValue.isValid()) {
+                    continue;
+                }
+                if (!lessenRules.isCheckType() && var.getName().equals("Type") && !varValue.isValid()) {
+                    continue;
                 }
 
                 failureTuples.add(new Tuple(new VarBindingDef(var, varValue)));

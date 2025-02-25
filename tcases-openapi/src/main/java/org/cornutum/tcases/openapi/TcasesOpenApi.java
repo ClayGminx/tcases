@@ -10,12 +10,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Paths;
 import org.cornutum.tcases.SystemInputDef;
-import org.cornutum.tcases.common.LessenCommand;
-import org.cornutum.tcases.common.LessenCommandUtil;
+import org.cornutum.tcases.generator.less.LessenRules;
+import org.cornutum.tcases.generator.less.LessenRulesParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,8 +88,8 @@ public final class TcasesOpenApi {
         customOpenAPI(api, extensionFile);
 
         if (lessenFile != null) {
-            List<LessenCommand> list = LessenCommandUtil.read(lessenFile);
-            api.addExtension("x-lessen-commands", list);
+            LessenRules rules = LessenRulesParser.parse(lessenFile);
+            api.addExtension("x-lessen-rules", rules);
         }
     }
 
